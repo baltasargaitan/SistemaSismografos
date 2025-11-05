@@ -10,7 +10,7 @@ namespace Infraestructura.Persistencia
         {
             var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
 
-            // ⚙️ Cadena de conexión directa — asegurate que tu SQL Server esté corriendo
+            //  Cadena de conexión directa — 
             optionsBuilder.UseSqlServer(
                 "Server=NTBK-GAITAN\\SQLEXPRESS;Database=SistemaSismografosDB;Trusted_Connection=True;TrustServerCertificate=True;"
             );

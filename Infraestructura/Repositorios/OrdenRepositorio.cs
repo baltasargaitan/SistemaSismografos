@@ -17,13 +17,13 @@ namespace Infraestructura.Repositorios
             _db = context;
         }
 
-        public OrdenDeInspeccion BuscarPorNro(int nroOrden)
+        public async Task<OrdenDeInspeccion?> BuscarPorNroAsync(int nroOrden)
         {
-            return _db.OrdenesDeInspeccion
+            return await _db.OrdenesDeInspeccion
                 .Include(o => o.Estado)
                 .Include(o => o.Estacion)
                 .ThenInclude(e => e.Sismografos)
-                .FirstOrDefault(o => o.NroOrden == nroOrden);
+                .FirstOrDefaultAsync(o => o.NroOrden == nroOrden);
         }
 
         public async Task<List<OrdenDeInspeccion>> ObtenerTodasAsync()
@@ -35,7 +35,7 @@ namespace Infraestructura.Repositorios
                 .ToListAsync();
         }
 
-        public Estado BuscarEstado(string ambito, string nombreEstado)
+        public Estado? BuscarEstado(string ambito, string nombreEstado)
         {
             return _db.Estados.FirstOrDefault(e => e.Ambito == ambito && e.NombreEstado == nombreEstado);
         }

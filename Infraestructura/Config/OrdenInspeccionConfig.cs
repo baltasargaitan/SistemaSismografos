@@ -10,7 +10,7 @@ namespace Infraestructura.Config
         {
             builder.ToTable("OrdenesDeInspeccion");
 
-            // 🔑 Clave principal
+            //  Clave principal
             builder.HasKey(o => o.NroOrden);
 
             builder.Property(o => o.NroOrden)

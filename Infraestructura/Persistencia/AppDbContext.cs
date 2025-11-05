@@ -8,7 +8,7 @@ namespace Infraestructura.Persistencia
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        // 🗂️ DbSets principales
+        // 🗂 DbSets principales
         public DbSet<Empleado> Empleados { get; set; }
         public DbSet<Rol> Roles { get; set; }
         public DbSet<Usuario> Usuarios { get; set; }

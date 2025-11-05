@@ -6,7 +6,7 @@
         public string IdentificacionSismografo { get; private set; }
         public string NroSerie { get; private set; }
         public Estado EstadoActual { get; private set; }
-        public List<CambioEstado> CambiosEstado { get; private set; } = new();
+        public List<CambioEstado> CambiosEstado { get; private set; } = new();  //navegabilidad
 
         public Sismografo(
             DateTime fechaAdquisicion,

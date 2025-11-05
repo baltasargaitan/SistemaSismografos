@@ -4,6 +4,7 @@ using Dominio.Repositorios;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Api.Controllers
 {
@@ -31,6 +32,26 @@ namespace Api.Controllers
             });
 
             return Ok(resultado);
+        }
+
+
+        [HttpGet("motivos")]
+        public async Task<IActionResult> ObtenerMotivos()
+        {
+            try
+            {
+                var motivos = await _useCase.ObtenerMotivosAsync();
+                var resultado = motivos.Select(m => new
+                {
+                    tipoMotivo = m.TipoMotivo,
+                    descripcion = m.Descripcion
+                });
+                return Ok(resultado);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener motivos: {ex.Message}");
+            }
         }
 
 

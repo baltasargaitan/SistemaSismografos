@@ -7,5 +7,7 @@ namespace Dominio.Repositorios
     {
         //Task<Empleado?> ObtenerPorMailAsync(string mail);
         Empleado ObtenerPorMail(string mail);
+
+
     }
 }

@@ -181,6 +181,10 @@ namespace Infraestructura.Migrations
                     b.Property<string>("CodigoEstacion")
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("EmpleadoMail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(200)");
+
                     b.Property<DateTime?>("FechaHoraCierre")
                         .HasColumnType("datetime2");
 
@@ -200,6 +204,8 @@ namespace Infraestructura.Migrations
                     b.HasKey("NroOrden");
 
                     b.HasIndex("CodigoEstacion");
+
+                    b.HasIndex("EmpleadoMail");
 
                     b.HasIndex("Ambito", "NombreEstado");
 
@@ -331,10 +337,18 @@ namespace Infraestructura.Migrations
                         .HasForeignKey("CodigoEstacion")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("Dominio.Entidades.Empleado", "Empleado")
+                        .WithMany()
+                        .HasForeignKey("EmpleadoMail")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Dominio.Entidades.Estado", "Estado")
                         .WithMany()
                         .HasForeignKey("Ambito", "NombreEstado")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Empleado");
 
                     b.Navigation("Estacion");
 

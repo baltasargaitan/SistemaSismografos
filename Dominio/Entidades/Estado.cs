@@ -11,6 +11,8 @@
             NombreEstado = nombreEstado;
         }
 
+
+        public string GetNombre() => NombreEstado;
         public bool EsCompletamenteRealizada() => NombreEstado == "Completada";
         public bool EsAmbitoOrdenInspeccion() => Ambito == "OrdenInspeccion";
         public bool EsCerrada() => NombreEstado == "Cerrada";

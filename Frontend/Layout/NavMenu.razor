@@ -1,39 +1,55 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Frontend</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
+﻿@using Microsoft.AspNetCore.Components.Routing
+
+<nav class="flex flex-col h-screen w-64 bg-gray-900 text-white shadow-lg fixed">
+    <!-- Logo / Encabezado -->
+    <div class="px-6 py-4 flex items-center border-b border-gray-700">
+        <img src="favicon.png" class="w-8 h-8 mr-3 rounded-full" />
+        <h2 class="text-lg font-semibold tracking-wide">Sistema Sismográfico</h2>
+    </div>
+
+    <!-- Navegación -->
+    <div class="flex-1 overflow-y-auto mt-4">
+        <ul class="space-y-1">
+            <li>
+                <NavLink href="/" Match="NavLinkMatch.All"
+                         class="flex items-center px-5 py-2 hover:bg-gray-800 rounded transition-colors duration-200"
+                         activeClass="bg-gray-800 text-teal-400">
+                    <span class="oi oi-home mr-3"></span>
+                    Inicio
+                </NavLink>
+            </li>
+
+            <li>
+                <NavLink href="/cierre-inspeccion"
+                         class="flex items-center px-5 py-2 hover:bg-gray-800 rounded transition-colors duration-200"
+                         activeClass="bg-gray-800 text-teal-400">
+                    <span class="oi oi-check mr-3"></span>
+                    Cierre de Inspección
+                </NavLink>
+            </li>
+
+            <li>
+                <NavLink href="/historial"
+                         class="flex items-center px-5 py-2 hover:bg-gray-800 rounded transition-colors duration-200"
+                         activeClass="bg-gray-800 text-teal-400">
+                    <span class="oi oi-spreadsheet mr-3"></span>
+                    Historial de Órdenes
+                </NavLink>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Perfil / Footer -->
+    <div class="border-t border-gray-700 px-5 py-3 flex items-center justify-between">
+        <div class="flex items-center">
+            <img src="icon-192.png" class="w-8 h-8 rounded-full" />
+            <div class="ml-3">
+                <p class="text-sm font-medium">Usuario Logueado</p>
+                <p class="text-xs text-gray-400">responsable@empresa.com</p>
+            </div>
+        </div>
+        <button class="text-gray-400 hover:text-white transition">
+            <span class="oi oi-account-logout"></span>
         </button>
     </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="nav flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
+</nav>

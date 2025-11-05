@@ -10,21 +10,37 @@
         public Estado? Estado { get; private set; }
         public EstacionSismologica? Estacion { get; private set; }
 
+        public Empleado Empleado { get; private set; }
+
+
 
         public OrdenDeInspeccion(
             DateTime fechaHoraInicio,
             int nroOrden,
             Estado estado,
-            EstacionSismologica estacion)
+            EstacionSismologica estacion,
+            Empleado empleado)
         {
             FechaHoraInicio = fechaHoraInicio;
             NroOrden = nroOrden;
             Estado = estado;
             Estacion = estacion;
+            Empleado = empleado;
         }
 
-        public bool EsDeEmpleado(Empleado emp) => true; // stub
-        public bool EstaCompletamenteRealizada() => Estado.EsCompletamenteRealizada();
+        public bool EsDeEmpleado(Empleado emp)
+        {
+            if (Empleado == null || emp == null)
+                return false;
+
+            // Compara por mail, identificador único elegido y propuesto por SOL 
+            return Empleado.ObtenerMail() == emp.ObtenerMail();
+        }
+
+        public bool EstaCompletamenteRealizada()
+        {
+            return Estado != null && Estado.EsCompletamenteRealizada();
+        }
         public int GetNroOrden() => NroOrden;
         public DateTime GetFechaHoraInicio() => FechaHoraInicio;
         public DateTime? GetFechaFinalizacion() => FechaHoraFinalizacion;
@@ -37,11 +53,27 @@
         public void SetEstado(Estado estado) => Estado = estado;
 
         private OrdenDeInspeccion() { }
-        public void Cerrar()
+        //public void Cerrar()
+        //{
+        //    SetFechaHoraCierre();
+        //    SetEstado(new Estado("OrdenInspeccion", "Cerrada"));
+        //}
+
+        public void Cerrar(string observacion, Estado estadoCerrado)
         {
-            SetFechaHoraCierre();
-            SetEstado(new Estado("OrdenInspeccion", "Cerrada"));
+            if (string.IsNullOrWhiteSpace(observacion))
+                throw new InvalidOperationException("Observación requerida");
+
+            if (Estado?.EsCerrada() == true)
+                throw new InvalidOperationException("Orden ya cerrada");
+
+            ObservacionCierre = observacion;
+            FechaHoraCierre = DateTime.Now;
+            Estado = estadoCerrado;
         }
+
+
+
 
         public void EnviarSismografoParaReparacion() => Estacion.ObtenerIdSismografo()?.EnviarAReparar();
     }

@@ -4,13 +4,16 @@ namespace Dominio.Entidades
 {
     public class MotivoFueraServicio
     {
-        public string Comentario { get; private set; }
         public MotivoTipo Tipo { get; private set; }
+        public string Comentario { get; private set; }
+
+        [Obsolete("Solo para EF", true)]
+        protected MotivoFueraServicio() { }
 
         public MotivoFueraServicio(MotivoTipo tipo, string comentario)
         {
-            Tipo = tipo;
-            Comentario = comentario;
+            Tipo = tipo ?? throw new ArgumentNullException(nameof(tipo));
+            Comentario = comentario ?? string.Empty;
         }
     }
 }
