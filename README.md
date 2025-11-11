@@ -59,11 +59,12 @@ SistemaSismografos/
 ├── Dominio/
 │   ├── Entidades/
 │   ├── Interfaces/
-│   ├── Servicios/
+
 │   └── ...
 │
 ├── Aplicacion/
 │   ├── DTOs/
+│   ├── Servicios/
 │   ├── UseCases/
 │   └── ...
 │
