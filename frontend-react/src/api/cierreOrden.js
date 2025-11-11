@@ -23,3 +23,13 @@ export async function getMotivos() {
   if (!res.ok) throw new Error("Error al obtener motivos");
   return res.json();
 }
+
+
+
+
+/* 👇👇 NUEVO: trae lo que dejó el Observer en el backend */
+export async function getEventosMonitoreo() {
+  const res = await fetch(`${API_BASE}/api/CierreOrden/monitoreo`);
+  if (!res.ok) throw new Error("Error al obtener eventos de monitoreo");
+  return res.json();
+}

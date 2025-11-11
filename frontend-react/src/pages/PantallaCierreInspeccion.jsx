@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { motion } from "framer-motion";
 import {
   getOrdenesCerrables,
   postCerrarOrden,
@@ -15,9 +16,18 @@ export default function PantallaCierreInspeccion() {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
-  const [errorShown, setErrorShown] = useState(false); // evita mostrar repetidos
+  const [errorShown, setErrorShown] = useState(false);
+  const pageRef = useRef(null);
 
-  // ------- Cargar órdenes de inspección -------
+  // Evita foco accidental en el contenedor principal
+  const preventFocus = (e) => {
+    if (e.target === pageRef.current) {
+      e.preventDefault();
+      pageRef.current.blur();
+    }
+  };
+
+  // ------- Cargar órdenes -------
   async function fetchOrdenes() {
     setLoading(true);
     try {
@@ -34,11 +44,10 @@ export default function PantallaCierreInspeccion() {
     }
   }
 
-  // ------- Cargar motivos desde la API -------
+  // ------- Cargar motivos -------
   async function fetchMotivos() {
     try {
       const data = await getMotivos();
-      // se espera formato [{ tipoMotivo, descripcion }]
       setMotivos(data.map((m) => m.descripcion));
     } catch (e) {
       if (!errorShown) {
@@ -50,36 +59,29 @@ export default function PantallaCierreInspeccion() {
   }
 
   // ------- Cerrar una orden -------
-//   async function cerrarOrden(payload) {
-//     // validar antes de enviar
-//     if (!payload || !payload.NroOrden || !payload.MotivoTipo || !payload.Observacion) {
-//       if (!errorShown) {
-//         setToast({ kind: "error", msg: "Faltan datos obligatorios para cerrar la orden." });
-//         setErrorShown(true);
-//       }
-//       return;
-//     }
-
-async function cerrarOrden(payload) {
-  setBusy(true);
-  try {
-    const msg = await postCerrarOrden(payload);
-    setToast({ kind: "success", msg: "Orden cerrada correctamente. Mail enviado y monitor actualizado." });
-    setErrorShown(false);
-    await fetchOrdenes();
-    setSelected(null);
-  } catch (e) {
-    if (!errorShown) {
-      setToast({ kind: "error", msg: e.message || "Error al cerrar la orden." });
-      setErrorShown(true);
+  async function cerrarOrden(payload) {
+    setBusy(true);
+    try {
+      const msg = await postCerrarOrden(payload);
+      setToast({
+        kind: "success",
+        msg: "Orden cerrada correctamente. Mail enviado y monitor actualizado.",
+      });
+      setErrorShown(false);
+      await fetchOrdenes();
+      setSelected(null);
+    } catch (e) {
+      if (!errorShown) {
+        setToast({ kind: "error", msg: e.message || "Error al cerrar la orden." });
+        setErrorShown(true);
+      }
+      console.error("Error cerrando orden:", e);
+    } finally {
+      setBusy(false);
     }
-    console.error("Error cerrando orden:", e);
-  } finally {
-    setBusy(false);
   }
-}
 
-  // ------- Cargar datos al montar -------
+  // ------- Inicialización -------
   useEffect(() => {
     async function init() {
       setLoading(true);
@@ -107,37 +109,119 @@ async function cerrarOrden(payload) {
     [ordenes, selected]
   );
 
+  // ------- Render -------
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-4" tabIndex={-1}>
-      <h1 className="text-2xl font-semibold">Cerrar orden de inspección</h1>
+    <div
+      ref={pageRef}
+      onMouseDown={preventFocus}
+      className="relative min-h-screen bg-linear-to-b from-gray-950 via-black to-gray-900 text-white overflow-hidden select-none cursor-default"
+    >
+      {/* 🌌 Fondo animado */}
+      <motion.div
+        className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,255,255,0.05),transparent_70%)] pointer-events-none"
+        animate={{ backgroundPosition: ["0% 0%", "100% 100%", "0% 0%"] }}
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+      />
 
-      {toast && (
-        <Toast
-          kind={toast.kind}
-          msg={toast.msg}
-          onClose={() => {
-            setToast(null);
-            setErrorShown(false); // al cerrar el toast, permitir mostrar otro más adelante
+      {/* 🧭 Cabecera */}
+      <motion.header
+        className="relative z-10 text-center py-8 select-none"
+        initial={{ opacity: 0, y: -30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
+          Cierre de Órdenes de Inspección
+        </h1>
+        <p className="text-cyan-400 text-sm mt-2 uppercase tracking-widest">
+          SISGRAFOS — Sistema de Monitoreo Sísmico
+        </p>
+      </motion.header>
+
+      {/* 🧩 Contenido principal */}
+      <motion.main
+        className="relative z-10 max-w-7xl mx-auto p-6 space-y-6 "
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.8 }}
+      >
+        {toast && (
+          <Toast
+            kind={toast.kind}
+            msg={toast.msg}
+            onClose={() => {
+              setToast(null);
+              setErrorShown(false);
+            }}
+          />
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+          {/* 📋 Panel izquierdo — Tabla fija */}
+          <motion.div
+            className="max-h-[550px] overflow-y-auto bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-4 hover:shadow-cyan-500/20 transition-all cursor-default"
+            initial={{ y: 10, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            onMouseDown={(e) => e.preventDefault()} // evita foco accidental
+          >
+            <OrdersTable
+              data={ordenes}
+              selected={selected}
+              onSelect={setSelected}
+              onRefresh={fetchOrdenes}
+              loading={loading}
+            />
+          </motion.div>
+
+        {/* 🧠 Panel derecho — Form flexible */}
+        <motion.div
+          className="overflow-y-auto max-h-[calc(100vh-280px)] bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-6 hover:shadow-cyan-500/20 transition-all"
+          initial={{ y: 10, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
+          <FormCierre
+            orden={ordenSel}
+            motivos={motivos}
+            onSubmit={cerrarOrden}
+            busy={busy}
+          />
+        </motion.div>
+
+        </div>
+      </motion.main>
+
+      {/* 🧩 Footer */}
+      <motion.footer
+        className="relative z-10 text-center text-gray-500 text-xs tracking-widest py-6 select-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 0.8 }}
+        transition={{ delay: 1 }}
+      >
+        Universidad Tecnológica Nacional — Proyecto Red Sísmica 2025
+      </motion.footer>
+
+      {/* 🌊 Onda inferior */}
+      <motion.svg
+        className="absolute bottom-0 left-0 w-full opacity-10 pointer-events-none"
+        viewBox="0 0 1200 200"
+        preserveAspectRatio="none"
+      >
+        <motion.path
+          d="M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100"
+          stroke="cyan"
+          strokeWidth="2"
+          fill="transparent"
+          animate={{
+            d: [
+              "M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100",
+              "M0,100 Q100,120 200,100 T400,100 T600,80 T800,120 T1000,100 T1200,100",
+            ],
           }}
+          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
         />
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <OrdersTable
-          data={ordenes}
-          selected={selected}
-          onSelect={setSelected}
-          onRefresh={fetchOrdenes}
-          loading={loading}
-        />
-
-        <FormCierre
-          orden={ordenSel}
-          motivos={motivos}
-          onSubmit={cerrarOrden}
-          busy={busy}
-        />
-      </div>
+      </motion.svg>
     </div>
   );
 }

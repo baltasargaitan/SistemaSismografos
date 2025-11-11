@@ -1,29 +1,36 @@
-import { Check, AlertTriangle } from "lucide-react";
+import { motion } from "framer-motion";
+import { Check, AlertTriangle, Info } from "lucide-react";
 
-export default function Toast({ kind, msg, onClose }) {
-  const bg =
+export default function Toast({ kind = "info", msg, onClose }) {
+  // Colores coherentes con el resto de la app
+  const styles =
     kind === "success"
-      ? "bg-green-50 border-green-300 text-green-700"
+      ? "from-emerald-500/30 to-green-700/20 border-emerald-400/40 text-emerald-300"
       : kind === "error"
-      ? "bg-red-50 border-red-300 text-red-700"
-      : "bg-blue-50 border-blue-300 text-blue-700";
+      ? "from-red-600/30 to-red-800/20 border-red-400/40 text-red-300"
+      : "from-cyan-600/30 to-blue-800/20 border-cyan-400/40 text-cyan-300";
+
+  const Icon =
+    kind === "success" ? Check : kind === "error" ? AlertTriangle : Info;
 
   return (
-    <div className={`border rounded-xl px-4 py-3 text-sm flex items-start gap-2 ${bg}`}>
-      {kind === "success" ? (
-        <Check className="h-4 w-4 mt-0.5" />
-      ) : (
-        <AlertTriangle className="h-4 w-4 mt-0.5" />
-      )}
-      <span className="flex-1">{msg}</span>
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      className={`relative z-50 flex items-center gap-3 border rounded-2xl px-4 py-3 text-sm 
+        bg-linear-to-r ${styles} backdrop-blur-md shadow-[0_0_15px_rgba(0,0,0,0.4)]`}
+    >
+      <Icon className="h-5 w-5 shrink-0" />
+      <span className="flex-1 font-medium tracking-wide">{msg}</span>
       {onClose && (
         <button
           onClick={onClose}
-          className="text-xs underline underline-offset-2 hover:opacity-70"
+          className="text-xs text-gray-400 hover:text-white hover:underline underline-offset-4 transition-all"
         >
           Cerrar
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }
