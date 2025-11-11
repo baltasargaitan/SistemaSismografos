@@ -1,5 +1,4 @@
-# 🌐 Sistema Sismógrafos — Rama OBSERVER
-
+# 🌐 Sistema Sismógrafos
 ### 🛰️ Proyecto académico — UTN FRC | PPAI 2025  
 **Materia:** Diseño de Sistemas de Información  
 **Caso de uso principal:** *Dar cierre a orden de inspección de estación sismológica*  
