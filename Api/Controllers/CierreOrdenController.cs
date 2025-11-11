@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
+using Aplicacion.Servicios.Notificaciones; // 👈 agregado para acceder al ObservadorWebMonitor
 
 namespace Api.Controllers
 {
@@ -18,6 +19,10 @@ namespace Api.Controllers
         {
             _useCase = useCase;
         }
+
+        // ==========================================================
+        // 1️⃣ ÓRDENES CERRABLES
+        // ==========================================================
         [HttpGet("cerrables")]
         public async Task<IActionResult> ObtenerOrdenesCerrables()
         {
@@ -34,7 +39,9 @@ namespace Api.Controllers
             return Ok(resultado);
         }
 
-
+        // ==========================================================
+        // 2️⃣ MOTIVOS DISPONIBLES
+        // ==========================================================
         [HttpGet("motivos")]
         public async Task<IActionResult> ObtenerMotivos()
         {
@@ -54,10 +61,9 @@ namespace Api.Controllers
             }
         }
 
-
-
-
-
+        // ==========================================================
+        // 3️⃣ CERRAR ORDEN
+        // ==========================================================
         [HttpPost("cerrar")]
         public async Task<IActionResult> CerrarOrden([FromBody] CierreOrdenRequest request)
         {
@@ -69,6 +75,23 @@ namespace Api.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"Error al cerrar la orden: {ex.Message}");
+            }
+        }
+
+        // ==========================================================
+        // 4️⃣ MONITOREO DE EVENTOS (Observer)
+        // ==========================================================
+        [HttpGet("monitoreo")]
+        public IActionResult ObtenerEventosDeMonitoreo()
+        {
+            try
+            {
+                var eventos = ObservadorWebMonitor.ObtenerEventos();
+                return Ok(eventos);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Error al obtener eventos de monitoreo: {ex.Message}");
             }
         }
     }

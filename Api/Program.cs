@@ -72,6 +72,9 @@ builder.Services.AddAplicacion();
 builder.Services.AddSingleton<ISujetoCierreOrden, SujetoCierreOrden>();
 builder.Services.AddSingleton<IObservadorCierreOrden, ObservadorEmailSMTP>();
 builder.Services.AddSingleton<IObservadorCierreOrden, ObservadorConsola>();
+//pantalla monitoreo
+builder.Services.AddSingleton<IObservadorCierreOrden, ObservadorWebMonitor>();
+
 
 // ----------------------------------------------------------
 //  CORS: Permitir acceso desde el frontend (Vite localhost)
