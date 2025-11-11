@@ -7,13 +7,13 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
   const [observacion, setObservacion] = useState("");
   const [motivosList, setMotivosList] = useState([{ motivo: "", comentario: "" }]);
   const [confirmar, setConfirmar] = useState(false);
-  const [error, setError] = useState(null);
+  const [intentoEnvio, setIntentoEnvio] = useState(false);
 
   useEffect(() => {
     setObservacion("");
     setMotivosList([{ motivo: "", comentario: "" }]);
     setConfirmar(false);
-    setError(null);
+    setIntentoEnvio(false);
   }, [orden?.nroOrden]);
 
   if (!orden)
@@ -23,21 +23,23 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
       </div>
     );
 
-  function agregarMotivo() {
+  const agregarMotivo = () =>
     setMotivosList([...motivosList, { motivo: "", comentario: "" }]);
-  }
 
-  function actualizarMotivo(index, field, value) {
+  const actualizarMotivo = (index, field, value) => {
     const nuevos = [...motivosList];
     nuevos[index][field] = value;
     setMotivosList(nuevos);
-  }
+  };
 
   async function enviar(e) {
     e.preventDefault();
-    if (!observacion.trim()) return setError("Debe ingresar una observación.");
-    if (!confirmar) return setError("Debes confirmar el cierre.");
-    if (motivosList.some((m) => !m.motivo)) return setError("Selecciona al menos un motivo.");
+    setIntentoEnvio(true);
+
+    // validaciones SOLO al submit
+    if (!observacion.trim()) return;
+    if (motivosList.some((m) => !m.motivo)) return;
+    if (!confirmar) return;
 
     const motivosTipos = motivosList.map((m) => m.motivo);
     const comentarios = motivosList.map((m) => m.comentario);
@@ -49,34 +51,36 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
       MotivosTipo: motivosTipos,
       Comentarios: comentarios,
     });
+
+    // resetea tras éxito
+    setIntentoEnvio(false);
   }
 
   return (
     <form onSubmit={enviar} className="space-y-4" tabIndex={-1}>
-      {error && <Toast kind="error" msg={error} onClose={() => setError(null)} />}
-
       <div className="border rounded-2xl p-4 space-y-2 text-sm">
-        <p>
-          <strong>Orden:</strong> {orden.nroOrden}
-        </p>
-        <p>
-          <strong>Estación:</strong> {orden.estacion ?? "—"}
-        </p>
-        <p>
-          <strong>Estado:</strong> {orden.estado ?? "—"}
-        </p>
+        <p><strong>Orden:</strong> {orden.nroOrden}</p>
+        <p><strong>Estación:</strong> {orden.estacion ?? "—"}</p>
+        <p><strong>Estado:</strong> {orden.estado ?? "—"}</p>
       </div>
 
+      {/* Observación */}
       <div>
         <label className="text-sm font-medium">Observación</label>
         <textarea
-          className="w-full border rounded-xl p-2 mt-1"
+          className={`w-full border rounded-xl p-2 mt-1 ${
+            intentoEnvio && !observacion.trim() ? "border-red-500" : "border-gray-300"
+          }`}
           rows="4"
           value={observacion}
           onChange={(e) => setObservacion(e.target.value)}
         />
+        {intentoEnvio && !observacion.trim() && (
+          <p className="text-red-500 text-xs mt-1">Debe ingresar una observación.</p>
+        )}
       </div>
 
+      {/* Motivos */}
       <div className="space-y-3">
         {motivosList.map((m, i) => (
           <div key={i} className="border rounded-xl p-3">
@@ -85,10 +89,11 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
               value={m.motivo}
               onChange={(v) => actualizarMotivo(i, "motivo", v)}
               options={motivos}
+              error={intentoEnvio && !m.motivo ? "Debe seleccionar un motivo." : null}
             />
             <input
               placeholder="Comentario (opcional)"
-              className="w-full border rounded-xl p-2 mt-2"
+              className="w-full border rounded-xl p-2 mt-2 border-gray-300"
               value={m.comentario}
               onChange={(e) => actualizarMotivo(i, "comentario", e.target.value)}
             />
@@ -103,11 +108,17 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
         </button>
       </div>
 
-      <label className="flex items-center gap-2 text-sm">
+      {/* Confirmación */}
+      <label
+        className={`flex items-center gap-2 text-sm ${
+          intentoEnvio && !confirmar ? "text-red-600" : ""
+        }`}
+      >
         <input
           type="checkbox"
           checked={confirmar}
           onChange={(e) => setConfirmar(e.target.checked)}
+          className={`${intentoEnvio && !confirmar ? "outline outline-red-500" : ""}`}
         />
         Confirmo el cierre definitivo de la orden.
       </label>
@@ -119,6 +130,7 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
       >
         {busy ? "Cerrando..." : "Cerrar orden"}
       </button>
+
       {busy && <Spinner label="Procesando cierre" />}
     </form>
   );

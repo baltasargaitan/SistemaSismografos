@@ -4,8 +4,46 @@ using Aplicacion.Servicios.Notificaciones;
 using Infraestructura;
 using Infraestructura.Persistencia;
 using Microsoft.OpenApi.Models;
+using DotNetEnv;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MailKit.Security;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ----------------------------------------------------------
+//  CARGA DE VARIABLES DE ENTORNO
+// ----------------------------------------------------------
+DotNetEnv.Env.Load();
+Console.WriteLine("MAIL_USER=" + Environment.GetEnvironmentVariable("MAIL_USER"));
+Console.WriteLine("MAIL_KEY=" + Environment.GetEnvironmentVariable("MAIL_KEY"));
+Console.WriteLine("SMTP_FROM=" + Environment.GetEnvironmentVariable("SMTP_FROM"));
+Console.WriteLine("SMTP_NAME=" + Environment.GetEnvironmentVariable("SMTP_NAME"));
+
+// ----------------------------------------------------------
+//  CONFIGURACIÓN SMTP (inyecta variables de entorno reales)
+// ----------------------------------------------------------
+var smtpSettings = new SmtpSettings
+{
+    Host = "in-v3.mailjet.com",
+    Port = 587,
+    User = Environment.GetEnvironmentVariable("MAIL_USER") ?? "",
+    Password = Environment.GetEnvironmentVariable("MAIL_KEY") ?? "",
+    FromName = Environment.GetEnvironmentVariable("SMTP_NAME") ?? "",
+    FromAddress = Environment.GetEnvironmentVariable("SMTP_FROM") ?? "",
+    EnableSsl = true
+};
+
+builder.Services.Configure<SmtpSettings>(options =>
+{
+    options.Host = smtpSettings.Host;
+    options.Port = smtpSettings.Port;
+    options.User = smtpSettings.User;
+    options.Password = smtpSettings.Password;
+    options.FromName = smtpSettings.FromName;
+    options.FromAddress = smtpSettings.FromAddress;
+    options.EnableSsl = smtpSettings.EnableSsl;
+});
 
 // ----------------------------------------------------------
 //  SWAGGER Y CONTROLADORES
@@ -29,11 +67,6 @@ builder.Services.AddInfraestructura(builder.Configuration);
 builder.Services.AddAplicacion();
 
 // ----------------------------------------------------------
-//  CONFIGURACIÓN SMTP (SendGrid)
-// ----------------------------------------------------------
-builder.Services.Configure<SmtpSettings>(builder.Configuration.GetSection("Smtp"));
-
-// ----------------------------------------------------------
 //  REGISTRO DEL SUJETO Y OBSERVADORES (Patrón Observer)
 // ----------------------------------------------------------
 builder.Services.AddSingleton<ISujetoCierreOrden, SujetoCierreOrden>();
@@ -46,10 +79,10 @@ builder.Services.AddSingleton<IObservadorCierreOrden, ObservadorConsola>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
-    policy
-    .AllowAnyOrigin()       // permite cualquier origen (útil para test)
-    .AllowAnyHeader()
-    .AllowAnyMethod()
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyHeader()
+            .AllowAnyMethod()
     );
 });
 

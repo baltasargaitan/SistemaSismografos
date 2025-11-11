@@ -2,6 +2,7 @@
 {
     public interface IObservadorCierreOrden
     {
-        void Actualizar(string mensaje);
+        void Actualizar(string mensaje, string destinatario);
     }
+
 }

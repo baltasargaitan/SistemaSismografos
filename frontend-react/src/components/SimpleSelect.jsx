@@ -10,6 +10,7 @@ export default function SimpleSelect({
   label,
   disabled,
   name,
+  error,
 }) {
   const [open, setOpen] = useState(false);
   const btnRef = useRef(null);
@@ -28,11 +29,16 @@ export default function SimpleSelect({
         type="button"
         disabled={disabled}
         onClick={() => setOpen((v) => !v)}
-        className="w-full inline-flex items-center justify-between rounded-xl border px-3 py-2 text-left text-sm hover:bg-gray-100"
+        className={`w-full inline-flex items-center justify-between rounded-xl border px-3 py-2 text-left text-sm hover:bg-gray-100 ${
+          error ? "border-red-500" : "border-gray-300"
+        }`}
       >
         <span className={value ? "" : "text-gray-400"}>{value || placeholder}</span>
         <ChevronDown className="h-4 w-4 opacity-70" />
       </button>
+
+      {/* ⚠️ Solo se muestra si el padre pasa error */}
+      {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
 
       <AnimatePresence>
         {open && (

@@ -164,7 +164,7 @@ namespace Aplicacion.UseCases
                 $"Observación: {request.Observacion}\nFecha de cierre: {DateTime.Now:G}.";
 
             // Se notifica a todos los observadores registrados (monitor, correo, etc.)
-            _sujeto.Notificar(mensaje);
+            _sujeto.Notificar(mensaje, mailResp ?? empleadoRI.ObtenerMail());
 
             return $"Orden {ordenEntidad.GetNroOrden()} cerrada correctamente. Notificación enviada.";
         }

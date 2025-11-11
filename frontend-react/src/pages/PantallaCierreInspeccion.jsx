@@ -61,25 +61,10 @@ export default function PantallaCierreInspeccion() {
 //     }
 
 async function cerrarOrden(payload) {
-  // validar antes de enviar
-  if (
-    !payload ||
-    !payload.NroOrden ||
-    !payload.MotivosTipo || // plural
-    payload.MotivosTipo.length === 0 ||
-    !payload.Observacion
-  ) {
-    if (!errorShown) {
-      setToast({ kind: "error", msg: "Faltan datos obligatorios para cerrar la orden." });
-      setErrorShown(true);
-    }
-    return;
-  }
-
   setBusy(true);
   try {
     const msg = await postCerrarOrden(payload);
-    setToast({ kind: "success", msg });
+    setToast({ kind: "success", msg: "Orden cerrada correctamente. Mail enviado y monitor actualizado." });
     setErrorShown(false);
     await fetchOrdenes();
     setSelected(null);
@@ -92,29 +77,7 @@ async function cerrarOrden(payload) {
   } finally {
     setBusy(false);
   }
-
-
-
-
-
-
-    setBusy(true);
-    try {
-      const msg = await postCerrarOrden(payload);
-      setToast({ kind: "success", msg });
-      setErrorShown(false); // reset al éxito
-      await fetchOrdenes(); // refresca la tabla
-      setSelected(null);
-    } catch (e) {
-      if (!errorShown) {
-        setToast({ kind: "error", msg: e.message || "Error al cerrar la orden." });
-        setErrorShown(true);
-      }
-      console.error("Error cerrando orden:", e);
-    } finally {
-      setBusy(false);
-    }
-  }
+}
 
   // ------- Cargar datos al montar -------
   useEffect(() => {
