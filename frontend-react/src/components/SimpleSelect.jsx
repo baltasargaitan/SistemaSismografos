@@ -16,7 +16,7 @@ export default function SimpleSelect({
   const btnRef = useRef(null);
 
   return (
-    <div className="w-full relative text-white">
+    <div className="w-full relative text-white" style={{ zIndex: open ? 600 : 1 }}>
       {label && (
         <label
           className="block text-sm mb-1 font-medium text-cyan-200"
@@ -50,15 +50,19 @@ export default function SimpleSelect({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
-            className="absolute z-20 mt-1 w-full max-h-56 overflow-auto rounded-xl border border-cyan-400/20 bg-gray-900 shadow-lg backdrop-blur-md"
+            className="absolute z-500 mt-1 w-full max-h-40 overflow-auto rounded-xl border border-blue-400/50 shadow-2xl"
+            style={{ 
+              backgroundColor: '#0a0e12',
+              backdropFilter: 'none'
+            }}
           >
             {options.length === 0 && (
-              <li className="px-3 py-2 text-sm text-gray-500">
+              <li className="px-3 py-2 text-sm text-gray-500 bg-[#0a0e12]">
                 No hay opciones
               </li>
             )}
             {options.map((opt) => (
-              <li key={opt}>
+              <li key={opt} style={{ backgroundColor: '#0a0e12' }}>
                 <button
                   type="button"
                   onClick={() => {
@@ -66,8 +70,10 @@ export default function SimpleSelect({
                     setOpen(false);
                     btnRef.current?.focus();
                   }}
-                  className={`w-full text-left px-3 py-2 text-sm hover:bg-cyan-500/20 transition-all ${
-                    opt === value ? "bg-cyan-600/30" : ""
+                  className={`w-full text-left px-3 py-2 text-sm transition-all ${
+                    opt === value 
+                      ? "bg-blue-600 text-white font-medium" 
+                      : "text-gray-200 hover:bg-blue-900"
                   }`}
                 >
                   {opt}

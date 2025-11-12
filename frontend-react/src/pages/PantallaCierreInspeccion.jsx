@@ -67,7 +67,7 @@ export default function PantallaCierreInspeccion() {
       console.log("Respuesta del servidor:", msg);
       setToast({
         kind: "success",
-        msg: "Orden cerrada correctamente. Mail enviado y monitor actualizado.",
+        msg: "✅ ¡Orden cerrada exitosamente! Los responsables de reparación han sido notificados y el sismógrafo está marcado como fuera de servicio.",
       });
       setErrorShown(false);
       await fetchOrdenes();
@@ -75,7 +75,10 @@ export default function PantallaCierreInspeccion() {
     } catch (e) {
       console.error("Error completo cerrando orden:", e);
       if (!errorShown) {
-        setToast({ kind: "error", msg: e.message || "Error al cerrar la orden." });
+        setToast({ 
+          kind: "error", 
+          msg: `⚠️ Error al cerrar la orden: ${e.message || "Problema de conexión o datos incorrectos. Intente nuevamente."}` 
+        });
         setErrorShown(true);
       }
     } finally {

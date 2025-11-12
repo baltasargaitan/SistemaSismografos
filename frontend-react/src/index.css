@@ -1,12 +1,51 @@
 
 @import "tailwindcss";
 
+/* ============================================
+   PALETA DE COLORES SISMOLÓGICOS/TIERRA
+   Inspirada en tonos naturales de la Tierra
+   ============================================ */
+:root {
+  /* Tonos Tierra - Grises */
+  --earth-gray-50: #f8f9fa;
+  --earth-gray-100: #e9ecef;
+  --earth-gray-200: #dee2e6;
+  --earth-gray-700: #495057;
+  --earth-gray-900: #212529;
+  
+  /* Tonos Tierra - Verdes (Vegetación/Estabilidad) */
+  --earth-green-50: #e8f5e9;
+  --earth-green-500: #4caf50;
+  --earth-green-600: #43a047;
+  
+  /* Tonos Tierra - Azules (Agua/Cielo) */
+  --earth-blue-50: #e3f2fd;
+  --earth-blue-400: #42a5f5;
+  --earth-blue-600: #1e88e5;
+  --earth-blue-700: #1976d2;
+  
+  /* Tonos Tierra - Amarillos (Alerta/Precaución) */
+  --earth-yellow-50: #fff8e1;
+  --earth-yellow-500: #ffc107;
+  --earth-yellow-600: #ffb300;
+  
+  /* Tonos Tierra - Naranjas (Actividad Sísmica) */
+  --earth-orange-500: #ff9800;
+  --earth-orange-600: #fb8c00;
+  
+  /* Tonos Tierra - Rojos (Peligro/Urgencia) */
+  --earth-red-500: #f44336;
+  --earth-red-600: #e53935;
+}
+
 /* Previene scroll en html y body */
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   overflow: hidden;
+  /* Reducir cansancio visual con fondo suave */
+  background-color: var(--earth-gray-50);
 }
 
 #root {
@@ -22,5 +61,82 @@ html, body {
 
 /* Previene que el foco visual se vea al clickear contenedores */
 :focus-visible {
-  outline: none !important;
+  outline: 2px solid var(--earth-blue-400) !important;
+  outline-offset: 2px;
+}
+
+/* ============================================
+   MEJORAS DE ACCESIBILIDAD Y CONFORT VISUAL
+   ============================================ */
+
+/* Tooltips personalizados - MEJORADO para mejor visibilidad */
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(100% + 12px);
+  background: var(--earth-gray-900);
+  color: var(--earth-gray-50);
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  white-space: normal;
+  max-width: 280px;
+  width: max-content;
+  z-index: 9999;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), 0 0 0 1px var(--earth-gray-700);
+  border: 2px solid var(--earth-blue-500);
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(100% + 4px);
+  border: 8px solid transparent;
+  border-top-color: var(--earth-blue-500);
+  z-index: 9999;
+  pointer-events: none;
+}
+
+/* Animaciones suaves para reducir estrés visual */
+* {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Mejora de contraste para inputs - reducir cansancio visual */
+input, textarea, select {
+  font-size: 1rem !important;
+  line-height: 1.5 !important;
+}
+
+/* Estados de éxito claros */
+.success-state {
+  background-color: var(--earth-green-50);
+  border-color: var(--earth-green-500);
+  color: var(--earth-green-600);
+}
+
+/* Estados de error claros */
+.error-state {
+  background-color: #ffebee;
+  border-color: var(--earth-red-500);
+  color: var(--earth-red-600);
+}
+
+/* Estados de advertencia claros */
+.warning-state {
+  background-color: var(--earth-yellow-50);
+  border-color: var(--earth-yellow-600);
+  color: #f57f17;
 }
