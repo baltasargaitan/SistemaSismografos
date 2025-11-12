@@ -1,25 +1,55 @@
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+// Helper para agregar timeout a las peticiones
+async function fetchWithTimeout(url, options = {}, timeout = 30000) {
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), timeout);
+  
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    clearTimeout(id);
+    return response;
+  } catch (error) {
+    clearTimeout(id);
+    if (error.name === 'AbortError') {
+      throw new Error('La petición excedió el tiempo de espera (30s)');
+    }
+    throw error;
+  }
+}
+
 export async function getOrdenesCerrables() {
-  const res = await fetch(`${API_BASE}/api/CierreOrden/cerrables`);
+  const res = await fetchWithTimeout(`${API_BASE}/api/CierreOrden/cerrables`);
   if (!res.ok) throw new Error("Error al obtener las órdenes cerrables");
   return res.json();
 }
 
 export async function postCerrarOrden(payload) {
-  const res = await fetch(`${API_BASE}/api/CierreOrden/cerrar`, {
+  console.log("Enviando a:", `${API_BASE}/api/CierreOrden/cerrar`);
+  console.log("Payload:", payload);
+  
+  const res = await fetchWithTimeout(`${API_BASE}/api/CierreOrden/cerrar`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
+  
+  console.log("Status de respuesta:", res.status);
   const text = await res.text();
-  if (!res.ok) throw new Error(text);
+  console.log("Respuesta del servidor:", text);
+  
+  if (!res.ok) {
+    throw new Error(text || `Error ${res.status}: ${res.statusText}`);
+  }
   return text;
 }
 
 
 export async function getMotivos() {
-  const res = await fetch(`${API_BASE}/api/CierreOrden/motivos`);
+  const res = await fetchWithTimeout(`${API_BASE}/api/CierreOrden/motivos`);
   if (!res.ok) throw new Error("Error al obtener motivos");
   return res.json();
 }
@@ -29,7 +59,7 @@ export async function getMotivos() {
 
 /* 👇👇 NUEVO: trae lo que dejó el Observer en el backend */
 export async function getEventosMonitoreo() {
-  const res = await fetch(`${API_BASE}/api/CierreOrden/monitoreo`);
+  const res = await fetchWithTimeout(`${API_BASE}/api/CierreOrden/monitoreo`);
   if (!res.ok) throw new Error("Error al obtener eventos de monitoreo");
   return res.json();
 }

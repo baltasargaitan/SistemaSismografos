@@ -37,19 +37,23 @@ export default function PantallaInicio() {
         preserveAspectRatio="none"
       >
         
-        <motion.path
+        <path
           d="M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100"
           stroke="cyan"
           strokeWidth="2"
           fill="transparent"
-          animate={{
-            d: [
-              "M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100",
-              "M0,100 Q100,120 200,100 T400,100 T600,80 T800,120 T1000,100 T1200,100",
-            ],
-          }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        />
+        >
+          <animate
+            attributeName="d"
+            dur="2s"
+            repeatCount="indefinite"
+            values="
+              M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100;
+              M0,100 Q100,120 200,100 T400,100 T600,80 T800,120 T1000,100 T1200,100;
+              M0,100 Q100,80 200,100 T400,100 T600,100 T800,100 T1000,100 T1200,100
+            "
+          />
+        </path>
       </motion.svg>
 
       {/* Título central */}

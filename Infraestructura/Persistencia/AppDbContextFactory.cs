@@ -12,7 +12,7 @@ namespace Infraestructura.Persistencia
 
             //  Cadena de conexión directa — 
             optionsBuilder.UseSqlServer(
-                "Server=NTBK-GAITAN\\SQLEXPRESS;Database=SistemaSismografosDB;Trusted_Connection=True;TrustServerCertificate=True;"
+                "Server=localhost\\SQLEXPRESS;Database=SistemaSismografosDB;Trusted_Connection=True;TrustServerCertificate=True;"
             );
 
             return new AppDbContext(optionsBuilder.Options);

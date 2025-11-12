@@ -42,7 +42,7 @@
 //            // Empleados
 //            if (!await context.Empleados.AnyAsync())
 //            {
-//                var emp1 = new Empleado("Juan", "Pérez", "shootedbysar@gmail.com", "123456789");   // será el RI logueado
+//                var emp1 = new Empleado("Juan", "Pérez", "ikermavi2015@gmail.com", "123456789");   // será el RI logueado
 //                var emp2 = new Empleado("Sol", "Vega", "sol.vega@empresa.com", "987654321"); // otra inspectora
 //                var emp3 = new Empleado("Marcos", "Pomenich", "marcos.pomenich@empresa.com", "5551234"); // responsable reparación
 
@@ -50,7 +50,7 @@
 //                await context.SaveChangesAsync();
 //            }
 
-//            var empJuan = await context.Empleados.FirstAsync(e => e.Mail == "shootedbysar@gmail.com");
+//            var empJuan = await context.Empleados.FirstAsync(e => e.Mail == "ikermavi2015@gmail.com");
 //            var empMaria = await context.Empleados.FirstAsync(e => e.Mail == "sol.vega@empresa.com");
 
 //            // Estaciones + Sismógrafos
@@ -216,7 +216,7 @@ namespace Infraestructura.Persistencia
             await context.SaveChangesAsync();
 
             // ==================== EMPLEADOS ====================
-            var empJuan = new Empleado("Juan", "Pérez", "shootedbysar@gmail.com", "123456789");
+            var empJuan = new Empleado("Juan", "Pérez", "ikermavi2015@gmail.com", "123456789");
             var empSol = new Empleado("Sol", "Vega", "sol.vega@empresa.com", "987654321");
             var empMarcos = new Empleado("Marcos", "Pomenich", "marcos.pomenich@empresa.com", "5551234");
 

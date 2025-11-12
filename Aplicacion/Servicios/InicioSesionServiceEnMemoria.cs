@@ -18,12 +18,12 @@ namespace Aplicacion.Servicios
         {
             // Buscar el empleado con el mail específico
             var empleado = _empleadoRepo.ObtenerTodosAsync().Result
-                .FirstOrDefault(e => e.ObtenerMail() == "shootedbysar@gmail.com");
+                .FirstOrDefault(e => e.ObtenerMail() == "ikermavi2015@gmail.com");
 
             if (empleado == null)
             {
                 // Si no existe en la base, crear uno temporal en memoria
-                empleado = new Empleado("Juan", "Pérez", "shootedbysar@gmail.com", "3584207322");
+                empleado = new Empleado("Juan", "Pérez", "ikermavi2015@gmail.com", "3584207322");
             }
 
             // Retornar el usuario logueado asociado a ese empleado
