@@ -28,8 +28,7 @@ namespace Infraestructura.Config
                    .HasMaxLength(20);
 
             builder.HasMany(e => e.Roles)
-                   .WithOne()
-                   .OnDelete(DeleteBehavior.Cascade);
+                   .WithMany();
         }
     }
 }

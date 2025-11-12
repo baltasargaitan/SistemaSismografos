@@ -142,42 +142,57 @@ namespace Aplicacion.Servicios.Notificaciones
         /// <summary>
         /// cerrarOrdenInspeccion(): void
         /// Método principal del caso de uso según el diagrama de secuencia.
+        /// FLUJO SEGÚN DIAGRAMA:
+        /// 1. Validaciones previas
+        /// 2. buscarEstadoCerradoParaOrdenInspeccion()
+        /// 3. Cerrar orden (cambio de estado)
+        /// 4. actualizarIdSismografo() - con todos sus setters internos
+        /// 5. Guardar cambios en BD
+        /// 6. obtenerMailsResponsablesReparacion()
+        /// 7. notificar() - Patrón Observer (rediseño aplicado)
         /// </summary>
         public async Task<string> CerrarOrdenInspeccion(CierreOrdenRequest request)
         {
-            // 1. Validación del usuario en sesión
+            // =====================================================
+            // PASO 1: Validaciones previas
+            // =====================================================
             var usuario = _sesionService.ObtenerUsuarioLogueado();
             if (usuario == null)
                 return "No hay usuario logueado.";
 
-            // 2. Buscar orden por número
             var ordenEntidad = await _ordenRepo.BuscarPorNroAsync(request.NroOrden);
             if (ordenEntidad == null)
                 return $"No se encontró la orden {request.NroOrden}.";
 
-            // 3. Validaciones básicas de entrada
             if (string.IsNullOrWhiteSpace(request.Observacion))
                 return "Debe ingresar una observación.";
 
             if (!request.Confirmar)
                 return "Cierre cancelado por el usuario.";
 
-            // 4. Validar estado de la orden
             if (ordenEntidad.GetEstado()?.EsCerrada() == true)
                 return "La orden ya está cerrada.";
 
-            var estadoCerrado = BuscarEstadoCerradoParaOrdenInspeccion();
-
-            // 5. Validar motivos seleccionados
-            var motivosTiposRepo = await _motivoTipoRepo.ObtenerTodosAsync();
             if (request.MotivosTipo == null || request.MotivosTipo.Count == 0)
                 return "Debe seleccionar al menos un motivo.";
 
-            // 6. Guardar datos para notificación
+            // Obtener motivos del repositorio para validación posterior
+            var motivosTiposRepo = await _motivoTipoRepo.ObtenerTodosAsync();
+
+            // Guardar observación y fecha de cierre
             _observacionDeCierre = request.Observacion;
             _fechaHoraCierre = DateTime.Now;
 
-            // 7. Cerrar la orden según el método de dominio
+            // =====================================================
+            // PASO 2: buscarEstadoCerradoParaOrdenInspeccion()
+            // Según diagrama: se busca el estado ANTES de cerrar
+            // =====================================================
+            var estadoCerrado = BuscarEstadoCerradoParaOrdenInspeccion();
+
+            // =====================================================
+            // PASO 3: Cerrar la orden (cambio de estado)
+            // ordenEntidad.Cerrar() según el diagrama
+            // =====================================================
             try
             {
                 ordenEntidad.Cerrar(request.Observacion, estadoCerrado);
@@ -188,7 +203,8 @@ namespace Aplicacion.Servicios.Notificaciones
             }
 
             // =====================================================
-            // BLOQUE: Actualización del Sismógrafo
+            // PASO 4: actualizarIdSismografo()
+            // Según diagrama: después de cerrar orden
             // Loop Recorrer Miembros [Mientras haya miembros]
             // =====================================================
             var estacion = ordenEntidad.GetEstacion();
@@ -205,19 +221,25 @@ namespace Aplicacion.Servicios.Notificaciones
             }
 
             // =====================================================
-            // BLOQUE: Persistencia de la orden cerrada
+            // PASO 5: Guardar cambios en BD
+            // Según diagrama: después de actualizar sismógrafo
             // =====================================================
             _ordenRepo.Actualizar(ordenEntidad);
             await _ordenRepo.GuardarCambiosAsync();
 
             // =====================================================
-            // BLOQUE: Obtener mails responsables y notificar
+            // PASO 6: obtenerMailsResponsablesReparacion()
+            // Según diagrama: antes de notificar
             // =====================================================
             var empleados = await (_empleadoRepo.ObtenerTodosAsync()) ?? new List<Empleado>();
             var mailsResp = ObtenerMailsResponsablesReparacion(empleados);
             _mailsResponsablesReparaccion = mailsResp.ToArray();
 
-            // Notificar a todos los observadores
+            // =====================================================
+            // PASO 7: notificar()
+            // PATRÓN OBSERVER (rediseño aplicado - no modificar)
+            // Loop: Recorrer observadores y llamar actualizar()
+            // =====================================================
             Notificar();
 
             return $"Orden {ordenEntidad.GetNroOrden()} cerrada correctamente. Notificaciones enviadas.";
@@ -226,6 +248,16 @@ namespace Aplicacion.Servicios.Notificaciones
         /// <summary>
         /// actualizarIdSismografo(...): void
         /// Método según diagrama para actualizar el sismógrafo.
+        /// FLUJO SEGÚN DIAGRAMA:
+        /// 1. Obtener sismógrafo por identificación
+        /// 2. Validar relación con estación (sosDeEstacionSismologica)
+        /// 3. buscarEstadoSismografoFueraDeServicio()
+        /// 4. setNombreEstado()
+        /// 5. crearCambioEstado()
+        /// 6. setFechaHoraCierre()
+        /// 7. Loop: setMotivos() y setComentarios()
+        /// 8. enviarAReparar()
+        /// 9. Persistir cambios
         /// </summary>
         private async Task ActualizarIdSismografo(
             string identificacionSismografo,
@@ -234,7 +266,7 @@ namespace Aplicacion.Servicios.Notificaciones
             List<string> comentarios,
             IEnumerable<MotivoTipo> motivosTiposRepo)
         {
-            // Obtener el sismógrafo persistido por su identificador
+            // PASO 1: Obtener el sismógrafo persistido por su identificador
             var sismografoPersistido = await _sismografoRepo.ObtenerPorIdentificacionAsync(
                 identificacionSismografo
             );
@@ -245,25 +277,29 @@ namespace Aplicacion.Servicios.Notificaciones
             // Guardar ID del sismógrafo para notificación (extraer número de formato "SISMO-XXX")
             _idSismografo = ExtraerIdNumerico(sismografoPersistido.GetIdentificadorSismografo());
 
-            // Validar la relación según la secuencia
+            // PASO 2: Validar relación con estación según diagrama
+            // sosDeEstacionSismologica(estacion: EstacionSismologica): bool
             if (sismografoPersistido.SosDeEstacionSismologica(estacion))
             {
+                // PASO 3: buscarEstadoSismografoFueraDeServicio()
                 var estadoFueraServicio = BuscarEstadoSismografoFueraDeServicio();
 
-                // setNombreEstado(): void
+                // PASO 4: setNombreEstado(nombreEstado: String): void
+                SetNombreEstado(estadoFueraServicio.GetNombre());
                 sismografoPersistido.SetEstadoActual(estadoFueraServicio);
-                _nombreEstado = estadoFueraServicio.GetNombre();
 
-                // setFechaHoraCierre(fechaHoraCierre: DateTime): void
+                // PASO 5: crearCambioEstado()
                 var cambio = sismografoPersistido.CrearCambioEstado(estadoFueraServicio);
+
+                // PASO 6: setFechaHoraCierre(fechaHoraCierre: DateTime): void
+                SetFechaHoraCierre(_fechaHoraCierre);
                 cambio.SetFechaHoraFin();
 
-                // Guardar motivos y comentarios para notificación
+                // PASO 7: Loop - setMotivos() y setComentarios()
                 var motivosLista = new List<string>();
                 var comentariosLista = new List<string>();
 
-                // setMotivos(motivos: String[]): void
-                // setComentarios(comentarios: String[]): void
+                // Loop: Recorrer Miembros [Mientras haya miembros]
                 foreach (var tipo in motivosTipo)
                 {
                     var tipoEncontrado = motivosTiposRepo.FirstOrDefault(
@@ -285,16 +321,56 @@ namespace Aplicacion.Servicios.Notificaciones
                     }
                 }
 
-                // Actualizar atributos de la clase para Notificar()
-                _motivos = motivosLista.ToArray();
-                _comentarios = comentariosLista.ToArray();
+                // Actualizar atributos para Notificar() - Llamadas a setters según diagrama
+                SetMotivos(motivosLista.ToArray());
+                SetComentarios(comentariosLista.ToArray());
 
-                // Marcar envío a reparación
+                // PASO 8: enviarAReparar()
                 sismografoPersistido.EnviarAReparar();
 
-                // Persistir el sismógrafo modificado
+                // PASO 9: Persistir el sismógrafo modificado
                 await _sismografoRepo.ActualizarAsync(sismografoPersistido);
             }
+        }
+
+        // ==========================================================
+        // MÉTODOS SETTER EXPLÍCITOS (según diagrama de secuencia)
+        // ==========================================================
+
+        /// <summary>
+        /// setNombreEstado(nombreEstado: String): void
+        /// Setter explícito según diagrama UML de secuencia.
+        /// </summary>
+        private void SetNombreEstado(string nombreEstado)
+        {
+            _nombreEstado = nombreEstado;
+        }
+
+        /// <summary>
+        /// setFechaHoraCierre(fechaHoraCierre: DateTime): void
+        /// Setter explícito según diagrama UML de secuencia.
+        /// </summary>
+        private void SetFechaHoraCierre(DateTime fechaHoraCierre)
+        {
+            _fechaHoraCierre = fechaHoraCierre;
+        }
+
+        /// <summary>
+        /// setMotivos(motivos: String[]): void
+        /// Setter explícito según diagrama UML de secuencia.
+        /// </summary>
+        private void SetMotivos(string[] motivos)
+        {
+            _motivos = motivos ?? Array.Empty<string>();
+        }
+
+        /// <summary>
+        /// setComentarios(comentarios: String[]): void
+        /// Setter explícito según diagrama UML de secuencia.
+        /// </summary>
+        private void SetComentarios(string[] comentarios)
+        {
+            _comentarios = comentarios ?? Array.Empty<string>();
         }
 
         /// <summary>

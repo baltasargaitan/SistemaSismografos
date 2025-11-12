@@ -69,12 +69,13 @@ builder.Services.AddAplicacion();
 // ----------------------------------------------------------
 //  REGISTRO DEL SUJETO Y OBSERVADORES (Patrón Observer)
 //  Según el diagrama UML: GestorCierreInspeccion es el Sujeto Concreto
-//  IMPORTANTE: Cambiado a Scoped porque consume repositorios Scoped
+//  IMPORTANTE: Todos son Scoped para que se creen frescos en cada request
+//  y no mantengan datos obsoletos de ejecuciones anteriores
 // ----------------------------------------------------------
 builder.Services.AddScoped<ISujetoOrdenInspeccion, GestorCierreInspeccion>();
 builder.Services.AddScoped<GestorCierreInspeccion>(); // También como servicio directo
-builder.Services.AddSingleton<IObserverNotificacionCierre, PantallaCCRS>();
-builder.Services.AddSingleton<IObserverNotificacionCierre, InterfazNotificacionMail>();
+builder.Services.AddScoped<IObserverNotificacionCierre, PantallaCCRS>();
+builder.Services.AddScoped<IObserverNotificacionCierre, InterfazNotificacionMail>();
 // ObservadorWebMonitor ya no es un observador, solo una cola estática
 // Los eventos son registrados directamente por PantallaCCRS
 

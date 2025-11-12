@@ -175,24 +175,22 @@ namespace Infraestructura.Persistencia
     {
         public static async Task SeedAsync(AppDbContext context)
         {
-            await context.Database.MigrateAsync();
+            try
+            {
+                // SOLUCIÓN DEFINITIVA: Eliminar y recrear la base de datos
+                Console.WriteLine("Eliminando base de datos existente...");
+                await context.Database.EnsureDeletedAsync();
+                
+                Console.WriteLine("Creando base de datos limpia...");
+                await context.Database.EnsureCreatedAsync();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[ERROR] No se pudo recrear la base de datos: {ex.Message}");
+                throw;
+            }
 
-            Console.WriteLine("Limpiando base de datos existente...");
-
-            // Limpieza completa (importante el orden por las FK)
-            await context.MotivosFueraServicio.ExecuteDeleteAsync();
-            await context.CambiosEstado.ExecuteDeleteAsync();
-            await context.OrdenesDeInspeccion.ExecuteDeleteAsync();
-            await context.Sismografos.ExecuteDeleteAsync();
-            await context.EstacionesSismologicas.ExecuteDeleteAsync();
-            await context.Empleados.ExecuteDeleteAsync();
-            await context.Roles.ExecuteDeleteAsync();
-            await context.Estados.ExecuteDeleteAsync();
-            await context.MotivosTipo.ExecuteDeleteAsync();
-
-            await context.SaveChangesAsync();
-
-            Console.WriteLine("Tablas limpiadas. Poblando datos iniciales...");
+            Console.WriteLine("Poblando datos iniciales...");
 
             // ==================== ESTADOS ====================
             var estados = new List<Estado>
@@ -234,7 +232,7 @@ namespace Infraestructura.Persistencia
             var estadoOperativo = await context.Estados.FirstAsync(e => e.Ambito == "Sismografo" && e.NombreEstado == "Operativo");
 
             var estaciones = new List<EstacionSismologica>();
-            for (int i = 1; i <= 3; i++)
+            for (int i = 1; i <= 6; i++) // Aumentado a 6 estaciones
             {
                 var estacion = new EstacionSismologica(
                     codigoEstacion: $"EST-00{i}",
@@ -267,10 +265,23 @@ namespace Infraestructura.Persistencia
 
             var ordenes = new List<OrdenDeInspeccion>
             {
+                // ========== ÓRDENES DE JUAN (ikermavi2015@gmail.com) ==========
+                // Completadas (cerrables)
                 new OrdenDeInspeccion(DateTime.Now.AddHours(-10), 1001, estadoCompletada, estaciones[0], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-8), 1005, estadoCompletada, estaciones[1], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-6), 1006, estadoCompletada, estaciones[3], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-4), 1007, estadoCompletada, estaciones[4], empJuan),
+                
+                // Cerradas (no cerrables)
                 new OrdenDeInspeccion(DateTime.Now.AddHours(-20), 1002, estadoCerrada, estaciones[1], empJuan),
+                
+                // Pendientes (no cerrables)
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-5), 1004, estadoPendiente, estaciones[0], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-3), 1008, estadoPendiente, estaciones[5], empJuan),
+                
+                // ========== ÓRDENES DE SOL (otras personas) ==========
                 new OrdenDeInspeccion(DateTime.Now.AddHours(-15), 1003, estadoCompletada, estaciones[2], empSol),
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-5), 1004, estadoPendiente, estaciones[0], empJuan)
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-12), 1009, estadoCompletada, estaciones[4], empSol)
             };
 
             await context.OrdenesDeInspeccion.AddRangeAsync(ordenes);
@@ -281,20 +292,44 @@ namespace Infraestructura.Persistencia
             {
                 new MotivoTipo("1", "Falla eléctrica"),
                 new MotivoTipo("2", "Sin conectividad"),
-                new MotivoTipo("3", "Mantenimiento programado")
+                new MotivoTipo("3", "Mantenimiento programado"),
+                new MotivoTipo("4", "Calibración requerida"),
+                new MotivoTipo("5", "Daño estructural")
             };
             await context.MotivosTipo.AddRangeAsync(motivos);
             await context.SaveChangesAsync();
 
-            Console.WriteLine("Seed ejecutado correctamente. Órdenes pobladas:");
-            Console.WriteLine("- 1001 (Completada, Juan) → ENTRA EN FILTRO");
-            Console.WriteLine("- 1002 (Cerrada, Juan) → NO ENTRA");
-            Console.WriteLine("- 1003 (Completada, Sol) → NO ENTRA");
-            Console.WriteLine("- 1004 (Pendiente, Juan) → NO ENTRA");
-            Console.WriteLine("\nEmpleados Responsables de Reparación:");
-            Console.WriteLine("- Marcos Pomenich (marcos.pomenich@empresa.com)");
-            Console.WriteLine("- Carla Rodríguez (carla.rodriguez@empresa.com)");
-            Console.WriteLine("- Luis Fernández (luis.fernandez@empresa.com)");
+            Console.WriteLine("\n════════════════════════════════════════════════════════");
+            Console.WriteLine("✅ SEED EJECUTADO CORRECTAMENTE");
+            Console.WriteLine("════════════════════════════════════════════════════════");
+            
+            Console.WriteLine("\n📋 ÓRDENES DE JUAN (ikermavi2015@gmail.com):");
+            Console.WriteLine("   ✓ CERRABLES (Completadas):");
+            Console.WriteLine("     - 1001 (Estación 1) ← CERRABLE");
+            Console.WriteLine("     - 1005 (Estación 2) ← CERRABLE");
+            Console.WriteLine("     - 1006 (Estación 4) ← CERRABLE");
+            Console.WriteLine("     - 1007 (Estación 5) ← CERRABLE");
+            Console.WriteLine("   ✗ NO CERRABLES:");
+            Console.WriteLine("     - 1002 (Cerrada)");
+            Console.WriteLine("     - 1004 (Pendiente)");
+            Console.WriteLine("     - 1008 (Pendiente)");
+            
+            Console.WriteLine("\n📋 ÓRDENES DE SOL:");
+            Console.WriteLine("     - 1003 (Completada)");
+            Console.WriteLine("     - 1009 (Completada)");
+            
+            Console.WriteLine("\n👥 EMPLEADOS RESPONSABLES DE REPARACIÓN:");
+            Console.WriteLine("     - Marcos Pomenich (marcos.pomenich@empresa.com)");
+            Console.WriteLine("     - Carla Rodríguez (carla.rodriguez@empresa.com)");
+            Console.WriteLine("     - Luis Fernández (luis.fernandez@empresa.com)");
+            
+            Console.WriteLine("\n🏢 ESTACIONES Y SISMÓGRAFOS:");
+            Console.WriteLine("     - 6 estaciones creadas (EST-001 a EST-006)");
+            Console.WriteLine("     - 6 sismógrafos operativos (SISMO-001 a SISMO-006)");
+            
+            Console.WriteLine("\n📝 MOTIVOS DISPONIBLES:");
+            Console.WriteLine("     - 5 tipos de motivos cargados");
+            Console.WriteLine("════════════════════════════════════════════════════════\n");
         }
     }
 }

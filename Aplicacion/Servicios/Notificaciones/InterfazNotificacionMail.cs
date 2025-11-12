@@ -85,7 +85,8 @@ namespace Aplicacion.Servicios.Notificaciones
                 mensaje.Body = bodyBuilder.ToMessageBody();
 
                 using var client = new MailKit.Net.Smtp.SmtpClient();
-                client.Connect(_smtpSettings.Host, _smtpSettings.Port, _smtpSettings.EnableSsl);
+                // Usar SecureSocketOptions.StartTls para STARTTLS en puerto 587
+                client.Connect(_smtpSettings.Host, _smtpSettings.Port, MailKit.Security.SecureSocketOptions.StartTls);
                 client.Authenticate(_smtpSettings.User, _smtpSettings.Password);
                 client.Send(mensaje);
                 client.Disconnect(true);
