@@ -4,3 +4,29 @@ GET {{Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Obtener órdenes cerrables
+GET {{Api_HostAddress}}/api/CierreOrden/cerrables
+Accept: application/json
+
+###
+
+# Obtener motivos disponibles
+GET {{Api_HostAddress}}/api/CierreOrden/motivos
+Accept: application/json
+
+###
+
+# Cerrar orden de inspección
+POST {{Api_HostAddress}}/api/CierreOrden/cerrar
+Content-Type: application/json
+
+{
+  "nroOrden": 1001,
+  "observacion": "Prueba de cierre con Observer pattern",
+  "motivosTipo": ["Falla Técnica", "Mantenimiento Preventivo"],
+  "comentarios": ["Sismógrafo dejó de registrar datos", "Se requiere calibración"],
+  "confirmar": true
+}
+
+###

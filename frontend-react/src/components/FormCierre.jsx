@@ -82,7 +82,7 @@ export default function FormCierre({ orden, motivos, onSubmit, busy }) {
     <form
       ref={formRef}
       onSubmit={validarYConfirmar}
-      className="space-y-4 text-white overflow-y-auto max-h-[calc(100vh-180px)] pr-1"
+      className="space-y-4 text-white"
     >
       {/* Información */}
       <div className="border border-cyan-400/30 rounded-2xl p-4 bg-white/5 backdrop-blur-sm space-y-2 text-sm">

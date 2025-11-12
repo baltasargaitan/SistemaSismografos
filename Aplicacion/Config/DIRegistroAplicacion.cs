@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Aplicacion.UseCases;
 using Aplicacion.Interfaces;
 
 namespace Aplicacion.Config
@@ -9,7 +8,8 @@ namespace Aplicacion.Config
         public static IServiceCollection RegistrarAplicacion(this IServiceCollection services)
         {
             // Use cases / servicios de aplicación
-            services.AddScoped<CerrarOrdenUseCase>();
+            // El GestorCierreInspeccion (antes CerrarOrdenUseCase) se registra como Singleton en Program.cs
+            // services.AddScoped<CerrarOrdenUseCase>(); // OBSOLETO - Reemplazado por GestorCierreInspeccion
 
             // Interfaces de infraestructura que debe suministrar Api/Infraestructura
             services.AddScoped<IPantallaCierreInspeccion, IPantallaCierreInspeccion>(); // placeholder; registrar implementación real en capa de presentación o Api

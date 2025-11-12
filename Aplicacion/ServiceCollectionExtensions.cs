@@ -1,5 +1,4 @@
 ﻿using Aplicacion.Interfaces;
-using Aplicacion.UseCases;
 using Aplicacion.Servicios;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +12,8 @@ namespace Aplicacion
         public static IServiceCollection AddAplicacion(this IServiceCollection services)
         {
             // 🧠 Casos de uso
-            services.AddScoped<CerrarOrdenUseCase>();
+            // El GestorCierreInspeccion (antes CerrarOrdenUseCase) se registra como Singleton en Program.cs
+            // services.AddScoped<CerrarOrdenUseCase>(); // OBSOLETO - Reemplazado por GestorCierreInspeccion
 
             // 💼 Servicios de aplicación
             services.AddScoped<IInicioSesionService, InicioSesionServiceEnMemoria>();

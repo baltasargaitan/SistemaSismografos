@@ -207,20 +207,27 @@ namespace Infraestructura.Persistencia
             await context.SaveChangesAsync();
 
             // ==================== ROLES ====================
-            var roles = new List<Rol>
-            {
-                new Rol("ResponsableReparacion", "Encargado de coordinar reparaciones"),
-                new Rol("Inspector", "Empleado que realiza inspecciones")
-            };
-            await context.Roles.AddRangeAsync(roles);
+            var rolResponsableReparacion = new Rol("ResponsableReparacion", "Encargado de coordinar reparaciones");
+            var rolInspector = new Rol("Inspector", "Empleado que realiza inspecciones");
+            
+            await context.Roles.AddRangeAsync(rolResponsableReparacion, rolInspector);
             await context.SaveChangesAsync();
 
             // ==================== EMPLEADOS ====================
             var empJuan = new Empleado("Juan", "Pérez", "ikermavi2015@gmail.com", "123456789");
             var empSol = new Empleado("Sol", "Vega", "sol.vega@empresa.com", "987654321");
             var empMarcos = new Empleado("Marcos", "Pomenich", "marcos.pomenich@empresa.com", "5551234");
+            var empCarla = new Empleado("Carla", "Rodríguez", "carla.rodriguez@empresa.com", "5559876");
+            var empLuis = new Empleado("Luis", "Fernández", "luis.fernandez@empresa.com", "5555555");
 
-            await context.Empleados.AddRangeAsync(empJuan, empSol, empMarcos);
+            // Asignar roles
+            empJuan.Roles.Add(rolInspector); // Inspector
+            empSol.Roles.Add(rolInspector); // Inspector
+            empMarcos.Roles.Add(rolResponsableReparacion); // Responsable de Reparación
+            empCarla.Roles.Add(rolResponsableReparacion); // Responsable de Reparación
+            empLuis.Roles.Add(rolResponsableReparacion); // Responsable de Reparación
+
+            await context.Empleados.AddRangeAsync(empJuan, empSol, empMarcos, empCarla, empLuis);
             await context.SaveChangesAsync();
 
             // ==================== ESTACIONES Y SISMÓGRAFOS ====================
@@ -284,6 +291,10 @@ namespace Infraestructura.Persistencia
             Console.WriteLine("- 1002 (Cerrada, Juan) → NO ENTRA");
             Console.WriteLine("- 1003 (Completada, Sol) → NO ENTRA");
             Console.WriteLine("- 1004 (Pendiente, Juan) → NO ENTRA");
+            Console.WriteLine("\nEmpleados Responsables de Reparación:");
+            Console.WriteLine("- Marcos Pomenich (marcos.pomenich@empresa.com)");
+            Console.WriteLine("- Carla Rodríguez (carla.rodriguez@empresa.com)");
+            Console.WriteLine("- Luis Fernández (luis.fernandez@empresa.com)");
         }
     }
 }

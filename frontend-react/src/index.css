@@ -1,6 +1,19 @@
 
 @import "tailwindcss";
 
+/* Previene scroll en html y body */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
 /* Quita el cursor de texto en cualquier elemento enfocado que no sea input o textarea */
 *:not(input):not(textarea):focus {
   outline: none !important;

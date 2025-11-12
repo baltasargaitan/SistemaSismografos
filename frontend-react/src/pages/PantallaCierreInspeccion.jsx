@@ -117,7 +117,7 @@ export default function PantallaCierreInspeccion() {
     <div
       ref={pageRef}
       onMouseDown={preventFocus}
-      className="relative min-h-screen bg-linear-to-b from-gray-950 via-black to-gray-900 text-white overflow-hidden select-none cursor-default"
+      className="relative h-screen bg-linear-to-b from-gray-950 via-black to-gray-900 text-white overflow-hidden select-none cursor-default flex flex-col"
     >
       {/* 🌌 Fondo animado */}
       <motion.div
@@ -128,7 +128,7 @@ export default function PantallaCierreInspeccion() {
 
       {/* 🧭 Cabecera */}
       <motion.header
-        className="relative z-10 text-center py-8 select-none"
+        className="relative z-10 text-center py-8 select-none shrink-0"
         initial={{ opacity: 0, y: -30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
@@ -143,7 +143,7 @@ export default function PantallaCierreInspeccion() {
 
       {/* 🧩 Contenido principal */}
       <motion.main
-        className="relative z-10 max-w-7xl mx-auto p-6 space-y-6 "
+        className="relative z-10 flex-1 overflow-hidden px-6 pb-6"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.3, duration: 0.8 }}
@@ -159,14 +159,14 @@ export default function PantallaCierreInspeccion() {
           />
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-          {/* 📋 Panel izquierdo — Tabla fija */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full max-w-7xl mx-auto">
+          {/* 📋 Panel izquierdo — Tabla */}
           <motion.div
-            className="max-h-[550px] overflow-y-auto bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-4 hover:shadow-cyan-500/20 transition-all cursor-default"
+            className="h-full overflow-y-auto bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-4 hover:shadow-cyan-500/20 transition-all cursor-default"
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.2 }}
-            onMouseDown={(e) => e.preventDefault()} // evita foco accidental
+            onMouseDown={(e) => e.preventDefault()}
           >
             <OrdersTable
               data={ordenes}
@@ -177,9 +177,9 @@ export default function PantallaCierreInspeccion() {
             />
           </motion.div>
 
-        {/* 🧠 Panel derecho — Form flexible */}
+        {/* 🧠 Panel derecho — Formulario */}
         <motion.div
-          className="overflow-y-auto max-h-[calc(100vh-280px)] bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-6 hover:shadow-cyan-500/20 transition-all"
+          className="h-full overflow-y-auto bg-white/5 backdrop-blur-md border border-cyan-500/20 rounded-3xl shadow-lg p-6 hover:shadow-cyan-500/20 transition-all"
           initial={{ y: 10, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -197,7 +197,7 @@ export default function PantallaCierreInspeccion() {
 
       {/* 🧩 Footer */}
       <motion.footer
-        className="relative z-10 text-center text-gray-500 text-xs tracking-widest py-6 select-none"
+        className="relative z-10 text-center text-gray-500 text-xs tracking-widest py-4 select-none shrink-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 0.8 }}
         transition={{ delay: 1 }}

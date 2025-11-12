@@ -1,11 +1,10 @@
 ﻿using Aplicacion.DTOs;
-using Aplicacion.UseCases;
+using Aplicacion.Servicios.Notificaciones;
 using Dominio.Repositorios;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using System.Linq;
-using Aplicacion.Servicios.Notificaciones; // 👈 agregado para acceder al ObservadorWebMonitor
 
 namespace Api.Controllers
 {
@@ -13,11 +12,11 @@ namespace Api.Controllers
     [Route("api/[controller]")]
     public class CierreOrdenController : ControllerBase
     {
-        private readonly CerrarOrdenUseCase _useCase;
+        private readonly GestorCierreInspeccion _gestor;
 
-        public CierreOrdenController(CerrarOrdenUseCase useCase)
+        public CierreOrdenController(GestorCierreInspeccion gestor)
         {
-            _useCase = useCase;
+            _gestor = gestor;
         }
 
         // ==========================================================
@@ -26,7 +25,7 @@ namespace Api.Controllers
         [HttpGet("cerrables")]
         public async Task<IActionResult> ObtenerOrdenesCerrables()
         {
-            var ordenes = await _useCase.buscarOrdenesDeInspeccion();
+            var ordenes = await _gestor.BuscarOrdenesDeInspeccion();
 
             var resultado = ordenes.Select(o => new
             {
@@ -47,7 +46,7 @@ namespace Api.Controllers
         {
             try
             {
-                var motivos = await _useCase.ObtenerMotivosAsync();
+                var motivos = await _gestor.ObtenerMotivosAsync();
                 var resultado = motivos.Select(m => new
                 {
                     tipoMotivo = m.TipoMotivo,
@@ -69,7 +68,7 @@ namespace Api.Controllers
         {
             try
             {
-                var resultado = await _useCase.CerrarOrdenAsync(request);
+                var resultado = await _gestor.CerrarOrdenInspeccion(request);
                 return Ok(resultado);
             }
             catch (Exception ex)
