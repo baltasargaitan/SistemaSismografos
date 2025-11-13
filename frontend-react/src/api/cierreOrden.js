@@ -22,9 +22,18 @@ async function fetchWithTimeout(url, options = {}, timeout = 30000) {
 }
 
 export async function getOrdenesCerrables() {
-  const res = await fetchWithTimeout(`${API_BASE}/api/CierreOrden/cerrables`);
+  const url = `${API_BASE}/api/CierreOrden/cerrables`;
+  console.log("🌐 Llamando a:", url);
+  console.log("🌐 API_BASE:", API_BASE);
+  
+  const res = await fetchWithTimeout(url);
+  console.log("📡 Status:", res.status);
+  
   if (!res.ok) throw new Error("Error al obtener las órdenes cerrables");
-  return res.json();
+  
+  const data = await res.json();
+  console.log("📦 Datos recibidos:", data);
+  return data;
 }
 
 export async function postCerrarOrden(payload) {

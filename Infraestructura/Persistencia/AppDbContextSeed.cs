@@ -213,9 +213,9 @@ namespace Infraestructura.Persistencia
             await context.SaveChangesAsync();
 
             // ==================== EMPLEADOS ====================
-            var empJuan = new Empleado("Juan", "Pérez", "ikermavi2015@gmail.com", "123456789");
+            var empJuan = new Empleado("Juan", "Pérez", "inspector@ejemplo.com", "123456789");
             var empSol = new Empleado("Sol", "Vega", "sol.vega@empresa.com", "987654321");
-            var empMarcos = new Empleado("Marcos", "Pomenich", "marcos.pomenich@empresa.com", "5551234");
+            var empMarcos = new Empleado("Marcos", "Pomenich", "ikermavi2015@gmail.com", "5551234");
             var empCarla = new Empleado("Carla", "Rodríguez", "carla.rodriguez@empresa.com", "5559876");
             var empLuis = new Empleado("Luis", "Fernández", "luis.fernandez@empresa.com", "5555555");
 

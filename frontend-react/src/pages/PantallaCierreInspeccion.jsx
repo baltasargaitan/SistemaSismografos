@@ -31,14 +31,17 @@ export default function PantallaCierreInspeccion() {
   async function fetchOrdenes() {
     setLoading(true);
     try {
+      console.log("🔍 Cargando órdenes cerrables...");
       const data = await getOrdenesCerrables();
+      console.log("📋 Órdenes recibidas:", data);
+      console.log("📋 Total órdenes:", data?.length || 0);
       setOrdenes(data);
     } catch (e) {
       if (!errorShown) {
         setToast({ kind: "error", msg: "Error al cargar órdenes" });
         setErrorShown(true);
       }
-      console.error("Error cargando órdenes:", e);
+      console.error("❌ Error cargando órdenes:", e);
     } finally {
       setLoading(false);
     }

@@ -56,7 +56,7 @@ namespace Aplicacion.Servicios.Notificaciones
         // y se utilizan cuando se llama a Notificar() para enviar a los observadores
         private string _observacionDeCierre = string.Empty;
         private DateTime _fechaHoraCierre;
-        private string[] _mailsResponsablesReparaccion = Array.Empty<string>();
+        private List<string> _mailsResponsablesReparacion = new List<string>();
         private int _idSismografo;
         private string _nombreEstado = string.Empty;
         private string[] _motivos = Array.Empty<string>();
@@ -295,7 +295,7 @@ namespace Aplicacion.Servicios.Notificaciones
             // ═══════════════════════════════════════════════════════════════
             var empleados = await (_empleadoRepo.ObtenerTodosAsync()) ?? new List<Empleado>();
             var mailsResp = ObtenerMailsResponsablesReparacion(empleados);
-            _mailsResponsablesReparaccion = mailsResp.ToArray();
+            _mailsResponsablesReparacion = mailsResp;
 
             // ═══════════════════════════════════════════════════════════════
             // PASO 7: NOTIFICAR A TODOS LOS OBSERVADORES (PATRÓN OBSERVER)
@@ -721,6 +721,8 @@ namespace Aplicacion.Servicios.Notificaciones
             Console.WriteLine($"   - ID Sismógrafo: {_idSismografo}");
             Console.WriteLine($"   - Estado: {_nombreEstado}");
             Console.WriteLine($"   - Motivos: {string.Join(", ", _motivos)}");
+            Console.WriteLine($"   - Emails responsables reparación: {string.Join(", ", _mailsResponsablesReparacion)}");
+            Console.WriteLine($"   - Total emails: {_mailsResponsablesReparacion.Count}");
             
             // Loop: Recorrer todos los observadores estáticos y notificar uno por uno
             int contador = 1;
@@ -738,7 +740,7 @@ namespace Aplicacion.Servicios.Notificaciones
                         fechaHoraCierre: _fechaHoraCierre,
                         motivos: _motivos,
                         comentarios: _comentarios,
-                        mailsResponsablesReparacion: _mailsResponsablesReparaccion
+                        mailsResponsablesReparacion: _mailsResponsablesReparacion.ToArray()
                     );
                     
                     Console.WriteLine($"   ✅ {observador.GetType().Name} notificado correctamente.");
