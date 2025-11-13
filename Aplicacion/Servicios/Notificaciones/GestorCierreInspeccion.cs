@@ -90,47 +90,6 @@ namespace Aplicacion.Servicios.Notificaciones
         #region ==================== MÉTODOS PÚBLICOS - CASOS DE USO ====================
 
         /// <summary>
-        /// ╔════════════════════════════════════════════════════════════════════╗
-        /// ║  INICIALIZACIÓN DEL GESTOR: iniC1()                               ║
-        /// ╚════════════════════════════════════════════════════════════════════╝
-        /// 
-        /// PROPÓSITO:
-        /// Configura e inicializa todos los observadores necesarios para el caso de uso.
-        /// Se ejecuta al iniciar la aplicación (llamado desde Program.cs).
-        /// 
-        /// FLUJO DE EJECUCIÓN:
-        /// 1. Crear instancia de PantallaCCRS
-        /// 2. Crear instancia de InterfazNotificacionMail
-        /// 3. Suscribir ambos observadores a la vez (pasando array)
-        /// 
-        /// RESULTADO:
-        /// La lista _observadores contiene todos los observadores suscritos
-        /// que serán notificados cuando se cierre una orden.
-        /// </summary>
-        public void IniC1()
-        {
-            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            Console.WriteLine("🔧 Inicializando GestorCierreInspeccion...");
-            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            
-            // Paso 1: Crear PantallaCCRS
-            Console.WriteLine("\n[PASO 1] Creando PantallaCCRS...");
-            var pantallaCCRS = CrearPantallaCCRS();
-            
-            // Paso 2: Crear InterfazNotificacionMail
-            Console.WriteLine("\n[PASO 2] Creando InterfazNotificacionMail...");
-            var interfazMail = CrearPantallasNotificacionMail();
-            
-            // Paso 3: Suscribir ambos observadores a la vez (array)
-            Console.WriteLine("\n[PASO 3] Suscribiendo observadores...");
-            Suscribir(new IObserverNotificacionCierre[] { pantallaCCRS, interfazMail });
-            
-            Console.WriteLine("\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-            Console.WriteLine($"✅ Gestor inicializado con {_observadoresGlobales.Count} observadores suscritos.");
-            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
-        }
-
-        /// <summary>
         /// CONSULTA: Obtiene todas las órdenes que pueden ser cerradas.
         /// Filtra por: empleado logueado + estado "CompletamenteRealizada".
         /// 
@@ -298,8 +257,38 @@ namespace Aplicacion.Servicios.Notificaciones
             _mailsResponsablesReparacion = mailsResp;
 
             // ═══════════════════════════════════════════════════════════════
-            // PASO 7: NOTIFICAR A TODOS LOS OBSERVADORES (PATRÓN OBSERVER)
-            // ═══════════════════════════════════════════════════════════════
+            // PASO 7: INICIALIZAR OBSERVADORES Y NOTIFICAR (PATRÓN OBSERVER)
+            // ──────────────────────────────────────────────────────────────
+            // Inicializar observadores inline (lógica antes en IniC1)
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            Console.WriteLine("🔧 Inicializando observadores para notificación...");
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+            
+            try
+            {
+                // Paso 7.1: Crear PantallaCCRS
+                Console.WriteLine("\n[PASO 7.1] Creando PantallaCCRS...");
+                var pantallaCCRS = CrearPantallaCCRS();
+                
+                // Paso 7.2: Crear InterfazNotificacionMail
+                Console.WriteLine("\n[PASO 7.2] Creando InterfazNotificacionMail...");
+                var interfazMail = CrearPantallasNotificacionMail();
+                
+                // Paso 7.3: Suscribir ambos observadores (evita duplicados por tipo)
+                Console.WriteLine("\n[PASO 7.3] Suscribiendo observadores...");
+                Suscribir(new IObserverNotificacionCierre[] { pantallaCCRS, interfazMail });
+                
+                Console.WriteLine($"\n✅ Observadores listos: {_observadoresGlobales.Count} suscritos.");
+            }
+            catch (Exception ex)
+            {
+                // No detener el cierre si la inicialización falla; loguear para diagnóstico
+                Console.WriteLine($"⚠️ Error inicializando observadores: {ex.Message}");
+            }
+            
+            Console.WriteLine("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n");
+
+            // Paso 7.4: Notificar a los observadores ya inicializados
             Notificar();
 
             return $"Orden {ordenEntidad.GetNroOrden()} cerrada correctamente. Notificaciones enviadas.";
@@ -648,9 +637,15 @@ namespace Aplicacion.Servicios.Notificaciones
                     continue;
                 }
 
+                // Evitar suscripciones duplicadas por TIPO de observador
+                if (_observadoresGlobales.Any(o => o.GetType() == observador.GetType()))
+                {
+                    Console.WriteLine($"⚠️ Observador '{observador.GetType().Name}' ya suscrito, se omite.");
+                    continue;
+                }
+
                 // Añadir a la lista estática compartida
                 _observadoresGlobales.Add(observador);
-                
                 Console.WriteLine($"✅ Observador '{observador.GetType().Name}' suscrito correctamente.");
             }
             

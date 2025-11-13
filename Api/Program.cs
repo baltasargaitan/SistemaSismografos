@@ -104,23 +104,10 @@ var app = builder.Build();
 app.UseCors("AllowAll");
 
 // ----------------------------------------------------------
-//  INICIALIZACIÓN DEL GESTOR (al iniciar app)
-//  El método IniC1() crea y suscribe los observadores manualmente:
-//  1. CrearPantallaCCRS() -> new PantallaCCRS()
-//  2. Suscribir(pantallaCCRS)
-//  3. CrearPantallasNotificacionMail() -> new InterfazNotificacionMail()
-//  4. Suscribir(interfazMail)
+//  NOTA: La inicialización de observadores ahora ocurre automáticamente
+//  dentro del método CerrarOrdenInspeccion() cuando se cierra una orden.
+//  Ya no es necesario llamar a IniC1() al inicio de la aplicación.
 // ----------------------------------------------------------
-using (var scope = app.Services.CreateScope())
-{
-    var gestor = scope.ServiceProvider.GetRequiredService<GestorCierreInspeccion>();
-    
-    // Llamar a IniC1() según diagrama
-    // Este método creará manualmente los observadores y los suscribirá
-    gestor.IniC1();
-    
-    Console.WriteLine("✅ GestorCierreInspeccion inicializado con observadores suscritos manualmente.");
-}
 
 // ----------------------------------------------------------
 //  SEED DE BASE DE DATOS AL ARRANCAR LA APLICACIÓN
