@@ -15,12 +15,22 @@ La rama **`observer`** implementa el **patrón de diseño Observer**, permitiend
 
 ## 🧩 Arquitectura general
 
-| Capa | Tecnología | Descripción |
-|------|-------------|-------------|
-| **Backend (API REST)** | ASP.NET Core 8 + EF Core | Expone endpoints para gestión de órdenes, sismógrafos, estados y notificaciones. |
-| **Persistencia** | SQL Server + Entity Framework | Repositorios concretos e implementación de patrón Unit of Work. |
-| **Frontend** | React + Vite + TailwindCSS | UI moderna, responsiva y modular. Usa Framer Motion para animaciones. |
-| **Comunicación** | HTTP + JSON | El cliente React interactúa con la API vía fetch/Axios. |
+El proyecto sigue una arquitectura en capas que promueve la separación de responsabilidades y facilita el mantenimiento:
+
+### **Dominio**
+Contiene las entidades principales y la lógica de negocio, totalmente independiente de frameworks o servicios externos.
+
+### **Aplicación**
+Define los casos de uso, los DTOs y las interfaces de los servicios que articulan la interacción entre las capas.
+
+### **Infraestructura**
+Implementa la capa de persistencia mediante Entity Framework Core 9.0.10, gestionando la conexión con la base de datos y los repositorios.
+
+### **API**
+Expone los controladores REST y configura el backend para la comunicación con el frontend.
+
+### **Frontend**
+Desarrollado con **React 19 + Vite 7**, encargado de la interfaz de usuario y la interacción con los servicios del backend. Utiliza **TailwindCSS** para el diseño responsivo y **Framer Motion** para animaciones fluidas.
 
 ---
 

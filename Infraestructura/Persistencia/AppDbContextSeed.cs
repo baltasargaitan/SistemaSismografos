@@ -197,7 +197,7 @@ namespace Infraestructura.Persistencia
             {
                 new Estado("OrdenInspeccion", "Pendiente"),
                 new Estado("OrdenInspeccion", "Cerrada"),
-                new Estado("OrdenInspeccion", "Completada"),
+                new Estado("OrdenInspeccion", "CompletamenteRealizada"),
                 new Estado("Sismografo", "Operativo"),
                 new Estado("Sismografo", "FueraDeServicio"),
                 new Estado("Sismografo", "EnReparacion")  // ✅ Agregado para workflow de reparación
@@ -262,16 +262,16 @@ namespace Infraestructura.Persistencia
             // ==================== ORDENES ====================
             var estadoPendiente = await context.Estados.FirstAsync(e => e.Ambito == "OrdenInspeccion" && e.NombreEstado == "Pendiente");
             var estadoCerrada = await context.Estados.FirstAsync(e => e.Ambito == "OrdenInspeccion" && e.NombreEstado == "Cerrada");
-            var estadoCompletada = await context.Estados.FirstAsync(e => e.Ambito == "OrdenInspeccion" && e.NombreEstado == "Completada");
+            var estadoCompletamenteRealizada = await context.Estados.FirstAsync(e => e.Ambito == "OrdenInspeccion" && e.NombreEstado == "CompletamenteRealizada");
 
             var ordenes = new List<OrdenDeInspeccion>
             {
                 // ========== ÓRDENES DE JUAN (ikermavi2015@gmail.com) ==========
-                // Completadas (cerrables)
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-10), 1001, estadoCompletada, estaciones[0], empJuan),
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-8), 1005, estadoCompletada, estaciones[1], empJuan),
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-6), 1006, estadoCompletada, estaciones[3], empJuan),
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-4), 1007, estadoCompletada, estaciones[4], empJuan),
+                // CompletamenteRealizada (cerrables)
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-10), 1001, estadoCompletamenteRealizada, estaciones[0], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-8), 1005, estadoCompletamenteRealizada, estaciones[1], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-6), 1006, estadoCompletamenteRealizada, estaciones[3], empJuan),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-4), 1007, estadoCompletamenteRealizada, estaciones[4], empJuan),
                 
                 // Cerradas (no cerrables)
                 new OrdenDeInspeccion(DateTime.Now.AddHours(-20), 1002, estadoCerrada, estaciones[1], empJuan),
@@ -281,8 +281,8 @@ namespace Infraestructura.Persistencia
                 new OrdenDeInspeccion(DateTime.Now.AddHours(-3), 1008, estadoPendiente, estaciones[5], empJuan),
                 
                 // ========== ÓRDENES DE SOL (otras personas) ==========
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-15), 1003, estadoCompletada, estaciones[2], empSol),
-                new OrdenDeInspeccion(DateTime.Now.AddHours(-12), 1009, estadoCompletada, estaciones[4], empSol)
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-15), 1003, estadoCompletamenteRealizada, estaciones[2], empSol),
+                new OrdenDeInspeccion(DateTime.Now.AddHours(-12), 1009, estadoCompletamenteRealizada, estaciones[4], empSol)
             };
 
             await context.OrdenesDeInspeccion.AddRangeAsync(ordenes);
@@ -305,7 +305,7 @@ namespace Infraestructura.Persistencia
             Console.WriteLine("════════════════════════════════════════════════════════");
             
             Console.WriteLine("\n📋 ÓRDENES DE JUAN (ikermavi2015@gmail.com):");
-            Console.WriteLine("   ✓ CERRABLES (Completadas):");
+            Console.WriteLine("   ✓ CERRABLES (CompletamenteRealizada):");
             Console.WriteLine("     - 1001 (Estación 1) ← CERRABLE");
             Console.WriteLine("     - 1005 (Estación 2) ← CERRABLE");
             Console.WriteLine("     - 1006 (Estación 4) ← CERRABLE");
@@ -316,8 +316,8 @@ namespace Infraestructura.Persistencia
             Console.WriteLine("     - 1008 (Pendiente)");
             
             Console.WriteLine("\n📋 ÓRDENES DE SOL:");
-            Console.WriteLine("     - 1003 (Completada)");
-            Console.WriteLine("     - 1009 (Completada)");
+            Console.WriteLine("     - 1003 (CompletamenteRealizada)");
+            Console.WriteLine("     - 1009 (CompletamenteRealizada)");
             
             Console.WriteLine("\n👥 EMPLEADOS RESPONSABLES DE REPARACIÓN:");
             Console.WriteLine("     - Marcos Pomenich (marcos.pomenich@empresa.com)");

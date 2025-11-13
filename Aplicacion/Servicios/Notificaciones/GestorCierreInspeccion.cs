@@ -132,12 +132,12 @@ namespace Aplicacion.Servicios.Notificaciones
 
         /// <summary>
         /// CONSULTA: Obtiene todas las órdenes que pueden ser cerradas.
-        /// Filtra por: empleado logueado + estado "Completada".
+        /// Filtra por: empleado logueado + estado "CompletamenteRealizada".
         /// 
         /// FLUJO:
         /// 1. Obtener usuario logueado
         /// 2. Obtener todas las órdenes
-        /// 3. Filtrar las que pertenecen al empleado y están completadas
+        /// 3. Filtrar las que pertenecen al empleado y están completamente realizadas
         /// </summary>
         public async Task<IEnumerable<OrdenDeInspeccion>> BuscarOrdenesDeInspeccion()
         {
@@ -148,7 +148,7 @@ namespace Aplicacion.Servicios.Notificaciones
             var empleado = usuario.GetRILogueado();
             var ordenes = await _ordenRepo.ObtenerTodasAsync();
 
-            // Filtra solo las órdenes del empleado actual y completadas
+            // Filtra solo las órdenes del empleado actual y completamente realizadas
             var cerrables = ordenes
                 .Where(o => o.EsDeEmpleado(empleado) && o.EstaCompletamenteRealizada())
                 .ToList();
@@ -429,8 +429,8 @@ namespace Aplicacion.Servicios.Notificaciones
                     var motivo = new MotivoFueraServicio(tipoEncontrado, comentario);
                     cambio.CrearMotivosFueraDeServicio(motivo);
 
-                    // Guardar para notificaciones
-                    motivosLista.Add(tipoEncontrado.TipoMotivo);
+                    // Guardar para notificaciones (usar Descripcion en lugar de TipoMotivo)
+                    motivosLista.Add(tipoEncontrado.Descripcion);
                     comentariosLista.Add(comentario);
                 }
             }

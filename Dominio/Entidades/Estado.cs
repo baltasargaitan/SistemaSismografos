@@ -13,7 +13,7 @@
 
 
         public string GetNombre() => NombreEstado;
-        public bool EsCompletamenteRealizada() => NombreEstado == "Completada";
+        public bool EsCompletamenteRealizada() => NombreEstado == "CompletamenteRealizada";
         public bool EsAmbitoOrdenInspeccion() => Ambito == "OrdenInspeccion";
         public bool EsCerrada() => NombreEstado == "Cerrada";
         public bool EsAmbitoSismografico() => Ambito == "Sismografo";
