@@ -34,7 +34,13 @@
         private Sismografo() { }
 
         public void SetEstadoActual(Estado estado) => EstadoActual = estado;
+        
+        // Sobrecarga: con estado proporcionado (lo correcto para persistencia)
+        public void EnviarAReparar(Estado estadoEnReparacion) => SetEstadoActual(estadoEnReparacion);
+        
+        // Sobrecarga: sin parámetro (crea estado nuevo - solo para lógica de dominio sin persistencia)
         public void EnviarAReparar() => SetEstadoActual(new Estado("Sismografo", "EnReparacion"));
+        
         public bool SosDeEstacionSismologica(EstacionSismologica est) => true;
     }
 }

@@ -199,7 +199,8 @@ namespace Infraestructura.Persistencia
                 new Estado("OrdenInspeccion", "Cerrada"),
                 new Estado("OrdenInspeccion", "Completada"),
                 new Estado("Sismografo", "Operativo"),
-                new Estado("Sismografo", "FueraDeServicio")
+                new Estado("Sismografo", "FueraDeServicio"),
+                new Estado("Sismografo", "EnReparacion")  // ✅ Agregado para workflow de reparación
             };
             await context.Estados.AddRangeAsync(estados);
             await context.SaveChangesAsync();

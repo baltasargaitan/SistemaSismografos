@@ -67,17 +67,17 @@ builder.Services.AddInfraestructura(builder.Configuration);
 builder.Services.AddAplicacion();
 
 // ----------------------------------------------------------
-//  REGISTRO DEL SUJETO Y OBSERVADORES (Patrón Observer)
+//  REGISTRO DEL SUJETO (Patrón Observer)
 //  Según el diagrama UML: GestorCierreInspeccion es el Sujeto Concreto
-//  IMPORTANTE: Todos son Scoped para que se creen frescos en cada request
-//  y no mantengan datos obsoletos de ejecuciones anteriores
+//  
+//  IMPORTANTE: Registrado como SCOPED porque necesita inyectar repositorios
+//  que también son Scoped (dependen del DbContext).
+//  
+//  Los observadores se crean una sola vez al iniciar la app y se almacenan
+//  en una lista estática que el gestor consulta en cada request.
 // ----------------------------------------------------------
 builder.Services.AddScoped<ISujetoOrdenInspeccion, GestorCierreInspeccion>();
 builder.Services.AddScoped<GestorCierreInspeccion>(); // También como servicio directo
-builder.Services.AddScoped<IObserverNotificacionCierre, PantallaCCRS>();
-builder.Services.AddScoped<IObserverNotificacionCierre, InterfazNotificacionMail>();
-// ObservadorWebMonitor ya no es un observador, solo una cola estática
-// Los eventos son registrados directamente por PantallaCCRS
 
 
 // ----------------------------------------------------------
@@ -105,16 +105,21 @@ app.UseCors("AllowAll");
 
 // ----------------------------------------------------------
 //  INICIALIZACIÓN DEL GESTOR (al iniciar app)
-//  Los observadores se inyectan automáticamente vía DI
+//  El método IniC1() crea y suscribe los observadores manualmente:
+//  1. CrearPantallaCCRS() -> new PantallaCCRS()
+//  2. Suscribir(pantallaCCRS)
+//  3. CrearPantallasNotificacionMail() -> new InterfazNotificacionMail()
+//  4. Suscribir(interfazMail)
 // ----------------------------------------------------------
 using (var scope = app.Services.CreateScope())
 {
     var gestor = scope.ServiceProvider.GetRequiredService<GestorCierreInspeccion>();
     
     // Llamar a IniC1() según diagrama
+    // Este método creará manualmente los observadores y los suscribirá
     gestor.IniC1();
     
-    Console.WriteLine("✅ GestorCierreInspeccion inicializado con observadores inyectados automáticamente.");
+    Console.WriteLine("✅ GestorCierreInspeccion inicializado con observadores suscritos manualmente.");
 }
 
 // ----------------------------------------------------------

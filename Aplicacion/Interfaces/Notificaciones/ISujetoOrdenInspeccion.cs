@@ -9,9 +9,10 @@ namespace Aplicacion.Interfaces.Notificaciones
     public interface ISujetoOrdenInspeccion
     {
         /// <summary>
-        /// Suscribe un observador al sujeto.
+        /// Suscribe múltiples observadores al sujeto de una sola vez.
+        /// Recibe un array de observadores y los añade a la lista interna.
         /// </summary>
-        void Suscribir(IObserverNotificacionCierre observador);
+        void Suscribir(IObserverNotificacionCierre[] observadores);
 
         /// <summary>
         /// Quita un observador del sujeto.

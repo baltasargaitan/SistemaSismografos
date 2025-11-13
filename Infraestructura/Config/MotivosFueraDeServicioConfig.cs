@@ -11,8 +11,10 @@ namespace Infraestructura.Config
         {
             builder.ToTable("MotivosFueraServicio");
 
-            // Clave primaria
-            builder.HasKey("Comentario");
+            // ✅ Clave primaria: ID auto-incremental generado por EF (propiedad sombra)
+            // No viola OOP porque el dominio NO conoce este ID, es solo para persistencia
+            builder.Property<int>("Id");
+            builder.HasKey("Id");
 
             // Mapeo del comentario
             builder.Property("Comentario")
